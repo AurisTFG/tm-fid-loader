@@ -34,12 +34,6 @@ void Main()
 		mainWindowLabel = "\\$b1f" + Icons::FolderOpen + "\\$z " + pluginName;
 	}
 	textInput = defaultText;
-
-	auto test = IO::FromAppFolder("Packs\\Trackmania.Title.Pack.gbx");
-	// print(test. /*todo -- check variable declaration below.*/;
-
-	print("CSystemFidsFolder.DirName: " + tostring(test));
-
 }
 
 void RenderMenu()
