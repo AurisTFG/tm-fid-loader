@@ -1,3 +1,5 @@
+bool canExtract = OpenplanetHasFullPermissions();
+
 bool mainWindowOpen = true;
 bool settingsWindowOpen = false;
 
@@ -161,6 +163,16 @@ void RenderMainWindow()
 					UI::Text(size + " B");
 
 					UI::TableSetColumnIndex(3);
+					
+					if (!canExtract)
+					{
+						vec4 color = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+						UI::PushStyleColor(UI::Col::Text, color);
+						UI::Text("Club access is required");
+						UI::PopStyleColor();
+						continue;
+					}
+
 					if (UI::Button("Extract##" + i))
 					{
 						if (Fids::Extract(foundFids[i].fid, extractHookMethod))
