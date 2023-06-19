@@ -27,7 +27,7 @@ void Main()
 	string pluginName = Meta::ExecutingPlugin().Name;
 	if (pluginName.EndsWith("(dev)"))
 	{
-		defaultText = "Maps/Campaigns/Training/Training - 18.Map.Gbx\nMedia/Musics/Stadium/Race/Race 1 - Chassis.ogg ";
+		defaultText = "Maps/Campaigns/Training/Training - 18.Map.Gbx\nMedia/Musics/Stadium/Race/Race 1 - Chassis.ogg";
 		mainWindowLabel = "\\$b1f" + Icons::FolderOpen + "\\$z\\$d00 " + pluginName;
 	}
 	else
@@ -72,22 +72,22 @@ void RenderSettingsWindow()
 		UI::Text("Functions to use:");
 
 		useGetFake = UI::Checkbox("GetFake", useGetFake);
-		Utils::AddTooltipOfWidth("Gets a file from \n" + "\"" + IO::FromAppFolder("Packs\\Trackmania.Title.Pack.gbx") + "\"", 700.0f);
+		Utils::AddTooltipOfWidth("Gets a file from \n\"" + IO::FromAppFolder("Packs\\Trackmania.Title.Pack.gbx") + "\"", 700.0f);
 
 		useGetGame = UI::Checkbox("GetGame", useGetGame);
-		Utils::AddTooltipOfWidth("Gets a file from from majority of the .pak and .zip files from \n" + "\"" + IO::FromAppFolder("Packs") + "\"", 700.0f);
+		Utils::AddTooltipOfWidth("Gets a file from from majority of the .pak and .zip files from \n\"" + IO::FromAppFolder("Packs") + "\"", 700.0f);
 
 		useGetResource = UI::Checkbox("GetResource", useGetResource);
-		Utils::AddTooltipOfWidth("Gets a file from \n" + "\"" + IO::FromAppFolder("Packs\\Resource.pak") + "\"", 700.0f);
+		Utils::AddTooltipOfWidth("Gets a file from \n\"" + IO::FromAppFolder("Packs\\Resource.pak") + "\"", 700.0f);
 
 		useGetUser = UI::Checkbox("GetUser", useGetUser);
-		Utils::AddTooltipOfWidth("Gets a file from \n" + "\"" + IO::FromUserGameFolder("") + "\"", 700.0f);
+		Utils::AddTooltipOfWidth("Gets a file from \n\"" + IO::FromUserGameFolder("") + "\"", 700.0f);
 
 		useGetProgramData = UI::Checkbox("GetProgramData", useGetProgramData);
 		Utils::AddTooltipOfWidth("Gets a file from \n\"C:\\ProgramData\\Trackmania2020\\\"", 700.0f);
-	}
 
-	UI::End();
+		UI::End();
+	}
 }
 
 void RenderMainWindow()
@@ -168,7 +168,7 @@ void RenderMainWindow()
 					{
 						vec4 color = vec4(1.0f, 0.0f, 0.0f, 1.0f);
 						UI::PushStyleColor(UI::Col::Text, color);
-						UI::Text("Club access is required");
+						UI::Text("Club access is required to extract files");
 						UI::PopStyleColor();
 						continue;
 					}
@@ -198,8 +198,6 @@ void RenderMainWindow()
 
 						if (@nod != null)
 						{
-							print("CMwNod.IdName: " + tostring(nod.IdName));
-							print("CMwNod.Id: " + tostring(nod.Id.Value));
 							ExploreNod(foundFids[i].fid.FileName, nod);
 						}
 						else
@@ -219,9 +217,9 @@ void RenderMainWindow()
 			}
 		}
 		UI::EndTable();
-	}
-	UI::EndGroup();
-	UI::GetWindowDrawList().AddRect(UI::GetItemRect(), customBorderColor, customBorderRounding, customBorderWidth);
+		UI::EndGroup();
+		UI::GetWindowDrawList().AddRect(UI::GetItemRect(), customBorderColor, customBorderRounding, customBorderWidth);
 
-	UI::End();
+		UI::End();
+	}
 }
