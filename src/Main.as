@@ -15,7 +15,6 @@ const string mainWindowLabelDefault = "\\$b1f" + Icons::FolderOpen + "\\$z " + p
 const string mainWindowLabelDev = "\\$b1f" + Icons::FolderOpen + "\\$z\\$d00 " + pluginName;
 
 string mainWindowLabel = mainWindowLabelDefault;
-bool mainWindowOpen = false;
 
 string textInput = defaultText;
 array<FidData>@ foundFids = array<FidData>();
@@ -26,25 +25,25 @@ void Main()
 	{
 		textInput = exampleText;
 		mainWindowLabel = mainWindowLabelDev;
-		mainWindowOpen = true;
+		Setting_WindowOpen = true;
 	}
 }
 
 void RenderMenu()
 {
-	if (UI::MenuItem(mainWindowLabel, "", mainWindowOpen))
-		mainWindowOpen = !mainWindowOpen;
+	if (UI::MenuItem(mainWindowLabel, "", Setting_WindowOpen))
+		Setting_WindowOpen = !Setting_WindowOpen;
 }
 
 void RenderInterface()
 {
-	if (mainWindowOpen) 
+	if (Setting_WindowOpen) 
 		RenderMainWindow();
 }
 
 void RenderMainWindow()
 {
-	UI::Begin(mainWindowLabel, mainWindowOpen, UI::WindowFlags::AlwaysAutoResize | UI::WindowFlags::NoCollapse);
+	UI::Begin(mainWindowLabel, Setting_WindowOpen, UI::WindowFlags::AlwaysAutoResize | UI::WindowFlags::NoCollapse);
 
 	UI::PushStyleVar(UI::StyleVar::FrameBorderSize, 1.5f);
 	UI::PushStyleColor(UI::Col::Border, customBorderColor);
@@ -110,8 +109,7 @@ void RenderMainWindow()
 
 			UI::TableSetColumnIndex(3);
 
-			if (!OPExtractPermission)
-				UI::PushStyleColor(UI::Col::Button, RedColor);
+			if (!OPExtractPermission) UI::PushStyleColor(UI::Col::Button, RedColor);
 			if (UI::Button("Extract##" + i))
 			{
 				if (OPExtractPermission)
@@ -126,12 +124,9 @@ void RenderMainWindow()
 					MyUI::TextFadeInit("Club access is required to extract files.", LogLevel::Error);
 				}
 			}
-			if (!OPExtractPermission)
-				UI::PopStyleColor();
+			if (!OPExtractPermission) UI::PopStyleColor();
 
-
-			if (!OPDevMode || !OPExtractPermission)
-				UI::PushStyleColor(UI::Col::Button, RedColor);
+			if (!OPDevMode || !OPExtractPermission) UI::PushStyleColor(UI::Col::Button, RedColor);
 			UI::SameLine();
 			if (UI::Button("Nod##" + i))
 			{
@@ -158,13 +153,12 @@ void RenderMainWindow()
 					MyUI::TextFadeInit("Enable Developer Mode in Openplanet to preload nods.", LogLevel::Warning);
 				}
 			}
-			if (!OPDevMode || !OPExtractPermission)
-				UI::PopStyleColor();
+			if (!OPDevMode || !OPExtractPermission) UI::PopStyleColor();
 
 
 			string folderPath = IO::FromDataFolder("Extract/" + foundFids[i].filePath.Replace(foundFids[i].fid.FileName, "")); // TODO: optimize this
-			if (!IO::FolderExists(folderPath))
-				UI::PushStyleColor(UI::Col::Button, RedColor);
+
+			if (!IO::FolderExists(folderPath)) UI::PushStyleColor(UI::Col::Button, RedColor);
 			UI::SameLine();
 			if (UI::Button("Open Folder##" + i))
 			{
@@ -178,8 +172,8 @@ void RenderMainWindow()
 					MyUI::TextFadeInit("Folder " + "\"" + folderPath + "\" does not exist.", LogLevel::Error);
 				}	
 			}
-			if (!IO::FolderExists(folderPath))
-				UI::PopStyleColor();
+			if (!IO::FolderExists(folderPath)) UI::PopStyleColor();
+
 		}
 		UI::EndTable();
 	}

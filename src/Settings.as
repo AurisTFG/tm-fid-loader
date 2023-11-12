@@ -1,6 +1,8 @@
-[Setting category="General" name="Extract with hook method" description="Hook method can help you to extract .gbx files that would usually get corrupted when extracting from .paks. However, this method will not always work and may even cause a game crash"]
-bool Setting_HookMethod = false;
+[Setting category="General" name="Window Open"]
+bool Setting_WindowOpen = false;
 
+[Setting category="General" name="Extract with Hook Method" description="Hook method can help you to extract .gbx files that would usually get corrupted when extracting from .paks. However, this method will not always work and may even cause a game crash"]
+bool Setting_HookMethod = false;
 
 
 [Setting category="Functions" name="GetFake" description="Gets a file from \"Packs/Trackmania.Title.Pack.gbx\""]
