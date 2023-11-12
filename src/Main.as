@@ -1,4 +1,21 @@
 
+const string defaultText = "*Type file paths here*";
+const string exampleText = """
+// GetFake:
+Maps/Campaigns/Training/Training - 18.Map.Gbx
+Scripts/Modes/TrackMania/TM_Laps_Online.Script.txt
+Libs/Nadeo/Trackmania/MainMenu/Constants.Script.txt
+// GetGame:
+Trackmania.exe
+MaterialLib_Stadium.txt
+// GetUser:
+Config/Default.json
+// GetProgramData:
+checksum.txt
+// GetResource:
+Media\Texture\HotGrid.Texture.gbx
+""";
+
 const bool OPExtractPermission = OpenplanetHasFullPermissions();
 // const bool OPExtractPermission = false;
 const bool OPDevMode = Meta::IsDeveloperMode();
@@ -9,12 +26,7 @@ const float customBorderWidth = 1.75f;
 const float customBorderRounding = 2.0f;
 
 const string pluginName = Meta::ExecutingPlugin().Name;
-const string defaultText = "*Type file paths here*";
-const string exampleText = "Maps/Campaigns/Training/Training - 18.Map.Gbx\nMedia/Musics/Stadium/Race/Race 1 - Chassis.ogg";
-const string mainWindowLabelDefault = "\\$b1f" + Icons::FolderOpen + "\\$z " + pluginName;
-const string mainWindowLabelDev = "\\$b1f" + Icons::FolderOpen + "\\$z\\$d00 " + pluginName;
-
-string mainWindowLabel = mainWindowLabelDefault;
+string windowLabel = "\\$b1f" + Icons::FolderOpen + "\\$z " + pluginName;
 
 string textInput = defaultText;
 array<FidData>@ foundFids = array<FidData>();
@@ -24,14 +36,14 @@ void Main()
 	if (pluginName.EndsWith("(dev)"))
 	{
 		textInput = exampleText;
-		mainWindowLabel = mainWindowLabelDev;
+		windowLabel = "\\$b1f" + Icons::FolderOpen + "\\$z\\$d00 " + pluginName;
 		Setting_WindowOpen = true;
 	}
 }
 
 void RenderMenu()
 {
-	if (UI::MenuItem(mainWindowLabel, "", Setting_WindowOpen))
+	if (UI::MenuItem(windowLabel, "", Setting_WindowOpen))
 		Setting_WindowOpen = !Setting_WindowOpen;
 }
 
@@ -43,11 +55,11 @@ void RenderInterface()
 
 void RenderMainWindow()
 {
-	UI::Begin(mainWindowLabel, Setting_WindowOpen, UI::WindowFlags::AlwaysAutoResize | UI::WindowFlags::NoCollapse);
+	UI::Begin(windowLabel, Setting_WindowOpen, UI::WindowFlags::NoCollapse);
 
 	UI::PushStyleVar(UI::StyleVar::FrameBorderSize, 1.5f);
 	UI::PushStyleColor(UI::Col::Border, customBorderColor);
-	textInput = UI::InputTextMultiline("##textInput", textInput, vec2 (800, 150));
+	textInput = UI::InputTextMultiline("##textInput", textInput, vec2(900, 200));
 	UI::PopStyleColor();
 	UI::PopStyleVar();
 

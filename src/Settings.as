@@ -5,17 +5,17 @@ bool Setting_WindowOpen = false;
 bool Setting_HookMethod = false;
 
 
-[Setting category="Functions" name="GetFake" description="Gets a file from \"Packs/Trackmania.Title.Pack.gbx\""]
+[Setting category="Functions" name="GetFake" description="Gets a file from the main TitlePack, e.g.: Trackmania.Title.Pack.Gbx"]
 bool Setting_GetFake = true;
 
-[Setting category="Functions" name="GetGame" description="Gets a file from of the .pak and .zip files"]
+[Setting category="Functions" name="GetGame" description="Gets a file from the install directory of the game, e.g.: \"C:/Program Files (x86)/Steam/steamapps/common/Trackmania\""]
 bool Setting_GetGame = true;
 
 [Setting category="Functions" name="GetResource" description="Gets a file from \"Packs/Resource.pak\""]
 bool Setting_GetResource = true;
 
-[Setting category="Functions" name="GetUser" description="Gets a file from \"Documents/Trackmania2020/\""]
+[Setting category="Functions" name="GetUser" description="Gets a file from the User directory of the game, e.g.: \"C:/Users/{Username}/Documents/Trackmania2020\""]
 bool Setting_GetUser = true;
 
-[Setting category="Functions" name="GetProgramData" description="Gets a file from \"C:/ProgramData/Trackmania2020/\""]
+[Setting category="Functions" name="GetProgramData" description="Gets a file from the ProgramData directory of the game, e.g.: \"C:/ProgramData/Trackmania2020/\""]
 bool Setting_GetProgramData = true;

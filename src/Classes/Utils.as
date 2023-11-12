@@ -1,5 +1,4 @@
 const array<string> methods = { "GetFake", "GetGame", "GetResource", "GetUser", "GetProgramData" };
-const array<bool> methodSettings = { Setting_GetFake, Setting_GetGame, Setting_GetResource, Setting_GetUser, Setting_GetProgramData };
 
 namespace Utils
 {
@@ -7,27 +6,46 @@ namespace Utils
     {
         array<FidData>@ foundFids = array<FidData>();
         array<string>@ filePaths = ParseFilePaths(text);
+        array<bool> methodSettings = GetSettings();
 
         for (uint i = 0; i < filePaths.Length; i++)
         {
-            if (filePaths[i].Length == 0) 
-                break;
-            
+            bool found = false;
             for (uint j = 0; j < methods.Length; j++)
             {
                 if (!methodSettings[j])
                     continue;
 
-                if (methods[j] == "GetFake" && !filePaths[i].StartsWith("Titles/Trackmania/"))
-                    filePaths[i] = "Titles/Trackmania/" + filePaths[i];
-                else if (methods[j] == "GetGame" && !filePaths[i].StartsWith("GameData/"))
-                    filePaths[i] = "GameData/" + filePaths[i];
+                array<string> pathsToTry = { filePaths[i] };
 
-                CSystemFidFile@ fid = LoadFid(methods[j], filePaths[i]);
-                if (@fid == null || fid.ByteSize == 0)
-                    continue;
+                if (methods[j] == "GetFake")
+                {
+                    pathsToTry.InsertLast("Titles/Trackmania/" + filePaths[i]);
+                    if (filePaths[i].EndsWith(".Script.txt"))
+                    {
+                        pathsToTry.InsertLast("Titles/Trackmania/Scripts/" + filePaths[i]);
+                    }
+                }
+                else if (methods[j] == "GetGame")
+                {
+                    pathsToTry.InsertLast("GameData/" + filePaths[i]);
+                }
 
-                foundFids.InsertLast(FidData(fid, filePaths[i], methods[j]));
+                for (uint k = 0; k < pathsToTry.Length; k++)
+                {
+                    CSystemFidFile@ fid = LoadFid(methods[j], pathsToTry[k]);
+                    if (@fid != null && fid.TimeWrite != "?")
+                    {
+                        foundFids.InsertLast(FidData(fid, pathsToTry[k], methods[j]));
+                        found = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!found)
+            {
+                print("Could not find fid for file: " + filePaths[i]);
             }
         }
 
@@ -41,9 +59,14 @@ namespace Utils
         array<string> lines = textInput.Split("\n");
         for (uint i = 0; i < lines.Length; i++)
         {
+            if (lines[i] == "" || lines[i].StartsWith("//") )
+                continue;
+
             string trimmed = lines[i].Trim().Replace("\"", "").Replace(",", "");
-            if (filePaths.Find(trimmed) == -1)
+            if (trimmed.Length > 0 && filePaths.Find(trimmed) == -1)
+            {
                 filePaths.InsertLast(trimmed);
+            }
         }  
 
         return filePaths;
@@ -51,18 +74,24 @@ namespace Utils
 
     CSystemFidFile@ LoadFid(const string &in method, const string &in filePath)
     {
-        if (method == "GetFake" && Setting_GetFake)
+        if (method == "GetFake")
             return Fids::GetFake(filePath);
-        else if (method == "GetGame" && Setting_GetGame)
+        else if (method == "GetGame")
             return Fids::GetGame(filePath);
-        else if (method == "GetResource" && Setting_GetResource)
+        else if (method == "GetResource")
             return Fids::GetResource(filePath);
-        else if (method == "GetUser" && Setting_GetUser)
+        else if (method == "GetUser")
             return Fids::GetUser(filePath);
-        else if (method == "GetProgramData" && Setting_GetProgramData)
+        else if (method == "GetProgramData")
             return Fids::GetProgramData(filePath);
 
         error("[Utils::LoadFid] Invalid method: " + method);
         return null;
-    }   
+    }
+
+    array<bool> GetSettings()
+    {
+        array<bool> methodSettings = { Setting_GetFake, Setting_GetGame, Setting_GetResource, Setting_GetUser, Setting_GetProgramData };
+        return methodSettings;
+    }
 }
