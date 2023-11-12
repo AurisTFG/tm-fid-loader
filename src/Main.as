@@ -65,17 +65,7 @@ void RenderMainWindow()
 
 	if (UI::Button(Icons::Search + " Search"))
 	{
-		@foundFids = Utils::SearchForFids(textInput);
-
-		if (foundFids.Length != 0)
-		{
-			string text = "Found " + foundFids.Length + ((foundFids.Length == 1) ? " file!" : " files!");
-			MyUI::TextFadeInit(text, LogLevel::Success);
-		}
-		else
-		{
-			MyUI::TextFadeInit("Did not find any files.", LogLevel::Error);
-		}
+		startnew(Utils::SearchForFidsCoro);
 	}
 
 	UI::SameLine();

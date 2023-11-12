@@ -2,6 +2,22 @@ const array<string> methods = { "GetFake", "GetGame", "GetResource", "GetUser", 
 
 namespace Utils
 {
+    void SearchForFidsCoro()
+    {
+        print("Searching for fids...");
+
+		@foundFids = Utils::SearchForFids(textInput);
+		if (foundFids.Length != 0)
+		{
+			string text = "Found " + foundFids.Length + ((foundFids.Length == 1) ? " file!" : " files!");
+			MyUI::TextFadeInit(text, LogLevel::Success);
+		}
+		else
+		{
+			MyUI::TextFadeInit("Did not find any files.", LogLevel::Error);
+		}
+    }
+
     array<FidData>@ SearchForFids(const string &in text)
     {
         array<FidData>@ foundFids = array<FidData>();
