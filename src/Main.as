@@ -1,4 +1,5 @@
 
+const string pluginName = Meta::ExecutingPlugin().Name;
 const string defaultText = "*Type file paths here*";
 const string exampleText = """
 // GetFake:
@@ -17,17 +18,10 @@ Media\Texture\HotGrid.Texture.gbx
 """;
 
 const bool OPExtractPermission = OpenplanetHasFullPermissions();
-// const bool OPExtractPermission = false;
 const bool OPDevMode = Meta::IsDeveloperMode();
-// const bool OPDevMode = false;
-
 const vec4 customBorderColor = vec4(UI::GetStyleColor(UI::Col::Button).xyz, 1.0f);
-const float customBorderWidth = 1.75f;
-const float customBorderRounding = 2.0f;
 
-const string pluginName = Meta::ExecutingPlugin().Name;
 string windowLabel = "\\$b1f" + Icons::FolderOpen + "\\$z " + pluginName;
-
 string textInput = defaultText;
 array<FidData>@ foundFids = array<FidData>();
 
@@ -67,15 +61,30 @@ void RenderMainWindow()
 	{
 		startnew(Utils::SearchForFidsCoro);
 	}
-
 	UI::SameLine();
+
 	if (UI::Button(Icons::Kenney::Fill + " Load Example"))
 	{
 		textInput = exampleText;
 		MyUI::TextFadeInit("Loaded an example.");
 	}
-
 	UI::SameLine();
+
+	if (!OPExtractPermission) UI::PushStyleColor(UI::Col::Button, RedColor);
+	if (UI::Button(Icons::FilesO + " Extract All Files"))
+	{
+		if (OPExtractPermission)
+		{
+			startnew(Utils::ExtractAllFilesCoro);
+		}
+		else
+		{
+			MyUI::TextFadeInit("Club access is required to extract files.", LogLevel::Error);
+		}
+	}
+	if (!OPExtractPermission) UI::PopStyleColor();
+	UI::SameLine();
+
 	if (UI::Button(Icons::TrashO + " Clear"))
 	{
 		textInput = "";
@@ -108,7 +117,6 @@ void RenderMainWindow()
 			UI::TableSetColumnIndex(0); UI::Text(foundFids[i].method);
 			UI::TableSetColumnIndex(1); UI::Text(foundFids[i].filePath);
 			UI::TableSetColumnIndex(2); UI::Text(foundFids[i].fid.ByteSize + " B");
-
 			UI::TableSetColumnIndex(3);
 
 			if (!OPExtractPermission) UI::PushStyleColor(UI::Col::Button, RedColor);
@@ -126,10 +134,10 @@ void RenderMainWindow()
 					MyUI::TextFadeInit("Club access is required to extract files.", LogLevel::Error);
 				}
 			}
+			UI::SameLine();
 			if (!OPExtractPermission) UI::PopStyleColor();
 
 			if (!OPDevMode || !OPExtractPermission) UI::PushStyleColor(UI::Col::Button, RedColor);
-			UI::SameLine();
 			if (UI::Button("Nod##" + i))
 			{
 				if (OPDevMode && OPExtractPermission)
@@ -155,13 +163,12 @@ void RenderMainWindow()
 					MyUI::TextFadeInit("Enable Developer Mode in Openplanet to preload nods.", LogLevel::Warning);
 				}
 			}
+			UI::SameLine();
 			if (!OPDevMode || !OPExtractPermission) UI::PopStyleColor();
-
 
 			string folderPath = IO::FromDataFolder("Extract/" + foundFids[i].filePath.Replace(foundFids[i].fid.FileName, "")); // TODO: optimize this
 
 			if (!IO::FolderExists(folderPath)) UI::PushStyleColor(UI::Col::Button, RedColor);
-			UI::SameLine();
 			if (UI::Button("Open Folder##" + i))
 			{
 				if (IO::FolderExists(folderPath))
@@ -180,6 +187,6 @@ void RenderMainWindow()
 		UI::EndTable();
 	}
 
-	UI::GetWindowDrawList().AddRect(UI::GetItemRect(), customBorderColor, customBorderRounding, customBorderWidth);
+	UI::GetWindowDrawList().AddRect(UI::GetItemRect(), customBorderColor, 2.0f, 1.75f);
 	UI::End();
 }

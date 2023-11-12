@@ -18,6 +18,30 @@ namespace Utils
 		}
     }
 
+    void ExtractAllFilesCoro()
+    {
+        print("Extracting all files...");
+
+        float filesCount = foundFids.Length;
+        float extractedCount = 0;
+        for (uint i = 0; i < foundFids.Length; i++)
+        {
+            bool success = Fids::Extract(foundFids[i].fid, Setting_HookMethod);
+            if (success)
+            {
+                extractedCount++;
+            }
+        }
+        if (extractedCount == 0)
+        {
+            MyUI::TextFadeInit("Did not manage to extract any files.", LogLevel::Error);
+            return;
+        }
+
+        float percent = extractedCount / filesCount * 100.0;
+        MyUI::TextFadeInit("Successfully extracted " + extractedCount + "/" + filesCount + "! (" + Text::Format("%.2f", percent) + "%)", LogLevel::Success);
+    }
+
     array<FidData>@ SearchForFids(const string &in text)
     {
         array<FidData>@ foundFids = array<FidData>();

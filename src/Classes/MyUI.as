@@ -4,7 +4,7 @@ const vec4 YellowColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);
 const vec4 RedColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
 const array<vec4> Colors = { WhiteColor, GreenColor, YellowColor, RedColor };
 
-const float TextFade_AlphaDecrease = 0.0035f;
+const float TextFade_AlphaDecrease = 0.0025f;
 vec4 TextFade_CurrentColor = -1.0f;
 string TextFade_CurrentText = "";
 
