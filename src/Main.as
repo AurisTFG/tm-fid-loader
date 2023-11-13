@@ -137,34 +137,30 @@ void RenderMainWindow()
 			UI::SameLine();
 			if (!OPExtractPermission) UI::PopStyleColor();
 
-			if (!OPDevMode || !OPExtractPermission) UI::PushStyleColor(UI::Col::Button, RedColor);
+			if (!OPDevMode || !OPExtractPermission || @foundFids[i].nod == null) UI::PushStyleColor(UI::Col::Button, RedColor);
 			if (UI::Button("Nod##" + i))
 			{
-				if (OPDevMode && OPExtractPermission)
+				if (OPDevMode && OPExtractPermission && @foundFids[i].nod != null)
 				{
 					auto nod = Fids::Preload(foundFids[i].fid);
-
-					if (@nod != null)
-					{
-						ExploreNod(foundFids[i].fid.FileName, nod);
-						MyUI::TextFadeInit("Preloaded nod for fid " + "\"" + foundFids[i].filePath + "\"", LogLevel::Success);
-					}
-					else
-					{
-						MyUI::TextFadeInit("Failed to preload nod for " + "\"" + foundFids[i].filePath + "\"", LogLevel::Error);
-					}
+					ExploreNod(foundFids[i].fid.FileName, nod);
+					MyUI::TextFadeInit("Opening Nod Explorer for fid " + "\"" + foundFids[i].filePath + "\"", LogLevel::Success);
 				}
 				else if (!OPExtractPermission)
 				{
-					MyUI::TextFadeInit("Club access is required to preload nods.", LogLevel::Error);
+					MyUI::TextFadeInit("Club access is required to Explore Nods.", LogLevel::Error);
 				}
 				else if (!OPDevMode)
 				{
-					MyUI::TextFadeInit("Enable Developer Mode in Openplanet to preload nods.", LogLevel::Warning);
+					MyUI::TextFadeInit("Enable Developer Mode in Openplanet to Explore Nods.", LogLevel::Warning);
+				}
+				else if (@foundFids[i].nod == null)
+				{
+					MyUI::TextFadeInit("Failed to preload nod for " + "\"" + foundFids[i].filePath + "\"", LogLevel::Error);
 				}
 			}
 			UI::SameLine();
-			if (!OPDevMode || !OPExtractPermission) UI::PopStyleColor();
+			if (!OPDevMode || !OPExtractPermission || @foundFids[i].nod == null) UI::PopStyleColor();
 
 			string folderPath = IO::FromDataFolder("Extract/" + foundFids[i].filePath.Replace(foundFids[i].fid.FileName, "")); // TODO: optimize this
 
@@ -178,7 +174,7 @@ void RenderMainWindow()
 				}
 				else
 				{
-					MyUI::TextFadeInit("Folder " + "\"" + folderPath + "\" does not exist.", LogLevel::Error);
+					MyUI::TextFadeInit("Folder " + "\"" + folderPath + "\" does not exist. Extract the file to create it.", LogLevel::Error);
 				}	
 			}
 			if (!IO::FolderExists(folderPath)) UI::PopStyleColor();
