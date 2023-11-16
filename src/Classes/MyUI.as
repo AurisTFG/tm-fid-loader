@@ -4,7 +4,7 @@ const vec4 YellowColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);
 const vec4 RedColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
 const array<vec4> Colors = { WhiteColor, GreenColor, YellowColor, RedColor };
 
-const float TextFade_Duration = 2.0f; // in seconds
+const float TextFade_DurationMs = 2000.0f; // in ms
 vec4 TextFade_CurrentColor = -1.0f;
 string TextFade_CurrentText = "";
 
@@ -77,6 +77,6 @@ namespace MyUI
         if (TextFade_CurrentText == "" || TextFade_CurrentColor.w <= 0.0f)
             return;
         
-        TextFade_CurrentColor.w -= dt / (TextFade_Duration * 1000);
+        TextFade_CurrentColor.w -= dt / TextFade_DurationMs;
     }
 }

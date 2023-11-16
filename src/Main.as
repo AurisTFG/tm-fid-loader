@@ -167,22 +167,21 @@ void RenderMainWindow()
 			UI::SameLine();
 			if (!OPDevMode || !OPExtractPermission || @foundFids[i].nod == null) UI::PopStyleColor();
 
-			string folderPath = IO::FromDataFolder("Extract/" + foundFids[i].filePath.Replace(foundFids[i].fid.FileName, "")); // TODO: optimize this
-
-			if (!IO::FolderExists(folderPath)) UI::PushStyleColor(UI::Col::Button, RedColor);
+			string folder = foundFids[i].folderPath;
+			if (!IO::FolderExists(folder)) UI::PushStyleColor(UI::Col::Button, RedColor);
 			if (UI::Button("Open Folder##" + i))
 			{
-				if (IO::FolderExists(folderPath))
+				if (IO::FolderExists(folder))
 				{
-					MyUI::TextFadeStart("Opening folder " + "\"" + folderPath + "\"");
-					OpenExplorerPath(folderPath);
+					MyUI::TextFadeStart("Opening folder " + "\"" + folder + "\"");
+					OpenExplorerPath(folder);
 				}
 				else
 				{
-					MyUI::TextFadeStart("Folder " + "\"" + folderPath + "\" does not exist. Extract the file to create it.", LogLevel::Error);
+					MyUI::TextFadeStart("Folder " + "\"" + folder + "\" does not exist. Extract the file to create it.", LogLevel::Error);
 				}	
 			}
-			if (!IO::FolderExists(folderPath)) UI::PopStyleColor();
+			if (!IO::FolderExists(folder)) UI::PopStyleColor();
 
 		}
 		UI::EndTable();
