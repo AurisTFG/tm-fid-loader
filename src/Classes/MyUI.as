@@ -4,7 +4,7 @@ const vec4 YellowColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);
 const vec4 RedColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
 const array<vec4> Colors = { WhiteColor, GreenColor, YellowColor, RedColor };
 
-const float TextFade_AlphaDecrease = 0.0025f;
+const float TextFade_Duration = 2.0f; // in seconds
 vec4 TextFade_CurrentColor = -1.0f;
 string TextFade_CurrentText = "";
 
@@ -25,7 +25,7 @@ namespace MyUI
         UI::Separator();
     }
 
-    void TextFadeInit(const string &in text, LogLevel level = LogLevel::Info, bool printToLog = true)
+    void TextFadeStart(const string &in text, LogLevel level = LogLevel::Info, bool printToLog = true)
     {
         TextFade_CurrentText = text;
         TextFade_CurrentColor = Colors[level];
@@ -56,7 +56,7 @@ namespace MyUI
         TextFade_CurrentColor.w = 0.0f;
     }
 
-    void TextFade()
+    void TextFadeRender()
     {
         if (TextFade_CurrentText == "")
             return;
@@ -67,10 +67,16 @@ namespace MyUI
             return;
         }
             
-        TextFade_CurrentColor.w -= TextFade_AlphaDecrease;
-
         UI::PushStyleColor(UI::Col::Text, TextFade_CurrentColor);
         UI::Text(TextFade_CurrentText);
         UI::PopStyleColor();
+    }
+
+    void TextFadeUpdate(float dt)
+    {
+        if (TextFade_CurrentText == "" || TextFade_CurrentColor.w <= 0.0f)
+            return;
+        
+        TextFade_CurrentColor.w -= dt / (TextFade_Duration * 1000);
     }
 }

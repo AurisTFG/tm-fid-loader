@@ -10,11 +10,11 @@ namespace Utils
 		if (foundFids.Length != 0)
 		{
 			string text = "Found " + foundFids.Length + ((foundFids.Length == 1) ? " file!" : " files!");
-			MyUI::TextFadeInit(text, LogLevel::Success);
+			MyUI::TextFadeStart(text, LogLevel::Success);
 		}
 		else
 		{
-			MyUI::TextFadeInit("Did not find any files.", LogLevel::Error);
+			MyUI::TextFadeStart("Did not find any files.", LogLevel::Error);
 		}
     }
 
@@ -34,12 +34,12 @@ namespace Utils
         }
         if (extractedCount == 0)
         {
-            MyUI::TextFadeInit("Did not manage to extract any files.", LogLevel::Error);
+            MyUI::TextFadeStart("Did not manage to extract any files.", LogLevel::Error);
             return;
         }
 
         float percent = extractedCount / filesCount * 100.0;
-        MyUI::TextFadeInit("Successfully extracted " + extractedCount + "/" + filesCount + "! (" + Text::Format("%.2f", percent) + "%)", LogLevel::Success);
+        MyUI::TextFadeStart("Successfully extracted " + extractedCount + "/" + filesCount + "! (" + Text::Format("%.2f", percent) + "%)", LogLevel::Success);
     }
 
     array<FidData>@ SearchForFids(const string &in text)

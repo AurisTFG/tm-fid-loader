@@ -5,10 +5,10 @@ bool Setting_WindowOpen = false;
 bool Setting_HookMethod = false;
 
 
-[Setting category="Functions" name="GetFake" description="Gets a file from the main TitlePack, e.g.: Trackmania.Title.Pack.Gbx"]
+[Setting category="Functions" name="GetFake" description="Gets a file from the main TitlePack, e.g.: Trackmania.Title.Pack.gbx"]
 bool Setting_GetFake = true;
 
-[Setting category="Functions" name="GetGame" description="Gets a file from the install directory of the game, e.g.: \"C:/Program Files (x86)/Steam/steamapps/common/Trackmania\""]
+[Setting category="Functions" name="GetGame" description="Gets a file from the install directory of the game, e.g.: \"C:/Program Files (x86)/Steam/steamapps/common/Trackmania\", also includes files from majority of the .paks"]
 bool Setting_GetGame = true;
 
 [Setting category="Functions" name="GetResource" description="Gets a file from \"Packs/Resource.pak\""]

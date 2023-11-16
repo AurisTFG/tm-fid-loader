@@ -47,6 +47,11 @@ void RenderInterface()
 		RenderMainWindow();
 }
 
+void Update(float dt)
+{
+	MyUI::TextFadeUpdate(dt);
+}
+
 void RenderMainWindow()
 {
 	UI::Begin(windowLabel, Setting_WindowOpen, UI::WindowFlags::NoCollapse);
@@ -66,7 +71,7 @@ void RenderMainWindow()
 	if (UI::Button(Icons::Kenney::Fill + " Load Example"))
 	{
 		textInput = exampleText;
-		MyUI::TextFadeInit("Loaded an example.");
+		MyUI::TextFadeStart("Loaded an example.");
 	}
 	UI::SameLine();
 
@@ -79,7 +84,7 @@ void RenderMainWindow()
 		}
 		else
 		{
-			MyUI::TextFadeInit("Club access is required to extract files.", LogLevel::Error);
+			MyUI::TextFadeStart("Club access is required to extract files.", LogLevel::Error);
 		}
 	}
 	if (!OPExtractPermission) UI::PopStyleColor();
@@ -92,7 +97,7 @@ void RenderMainWindow()
 		MyUI::TextFadeStop();
 	}
 
-	MyUI::TextFade();
+	MyUI::TextFadeRender();
 
 	if (foundFids.Length == 0)
 	{
@@ -125,13 +130,13 @@ void RenderMainWindow()
 				if (OPExtractPermission)
 				{
 					if (Fids::Extract(foundFids[i].fid, Setting_HookMethod))
-						MyUI::TextFadeInit("Successfully extracted file \"" + foundFids[i].filePath + "\"", LogLevel::Success);
+						MyUI::TextFadeStart("Successfully extracted file \"" + foundFids[i].filePath + "\"", LogLevel::Success);
 					else
-						MyUI::TextFadeInit("Failed to extract " + "\"" + foundFids[i].filePath + "\"", LogLevel::Error);
+						MyUI::TextFadeStart("Failed to extract " + "\"" + foundFids[i].filePath + "\"", LogLevel::Error);
 				}
 				else
 				{
-					MyUI::TextFadeInit("Club access is required to extract files.", LogLevel::Error);
+					MyUI::TextFadeStart("Club access is required to extract files.", LogLevel::Error);
 				}
 			}
 			UI::SameLine();
@@ -144,19 +149,19 @@ void RenderMainWindow()
 				{
 					auto nod = Fids::Preload(foundFids[i].fid);
 					ExploreNod(foundFids[i].fid.FileName, nod);
-					MyUI::TextFadeInit("Opening Nod Explorer for fid " + "\"" + foundFids[i].filePath + "\"", LogLevel::Success);
+					MyUI::TextFadeStart("Opening Nod Explorer for fid " + "\"" + foundFids[i].filePath + "\"", LogLevel::Success);
 				}
 				else if (!OPExtractPermission)
 				{
-					MyUI::TextFadeInit("Club access is required to Explore Nods.", LogLevel::Error);
+					MyUI::TextFadeStart("Club access is required to Explore Nods.", LogLevel::Error);
 				}
 				else if (!OPDevMode)
 				{
-					MyUI::TextFadeInit("Enable Developer Mode in Openplanet to Explore Nods.", LogLevel::Warning);
+					MyUI::TextFadeStart("Enable Developer Mode in Openplanet to Explore Nods.", LogLevel::Warning);
 				}
 				else if (@foundFids[i].nod == null)
 				{
-					MyUI::TextFadeInit("Failed to preload nod for " + "\"" + foundFids[i].filePath + "\"", LogLevel::Error);
+					MyUI::TextFadeStart("Failed to preload nod for " + "\"" + foundFids[i].filePath + "\"", LogLevel::Error);
 				}
 			}
 			UI::SameLine();
@@ -169,12 +174,12 @@ void RenderMainWindow()
 			{
 				if (IO::FolderExists(folderPath))
 				{
-					MyUI::TextFadeInit("Opening folder " + "\"" + folderPath + "\"");
+					MyUI::TextFadeStart("Opening folder " + "\"" + folderPath + "\"");
 					OpenExplorerPath(folderPath);
 				}
 				else
 				{
-					MyUI::TextFadeInit("Folder " + "\"" + folderPath + "\" does not exist. Extract the file to create it.", LogLevel::Error);
+					MyUI::TextFadeStart("Folder " + "\"" + folderPath + "\" does not exist. Extract the file to create it.", LogLevel::Error);
 				}	
 			}
 			if (!IO::FolderExists(folderPath)) UI::PopStyleColor();
