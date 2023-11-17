@@ -58,6 +58,7 @@ void Update(float dt)
 
 void RenderMainWindow()
 {
+	UI::SetNextWindowSize(920, 600);
 	UI::Begin(windowLabel, Setting_WindowOpen, UI::WindowFlags::NoCollapse);
 
 	UI::PushStyleVar(UI::StyleVar::FrameBorderSize, 1.5f);
