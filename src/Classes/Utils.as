@@ -74,12 +74,11 @@ namespace Utils
                 for (uint k = 0; k < pathsToTry.Length; k++)
                 {
                     CSystemFidFile@ fid = LoadFid(methods[j], pathsToTry[k]);
-
+#if TMNEXT
+                    bool fidIsValid = @fid != null && fid.TimeWrite != "?";
+#else
                     bool fidIsValid = @fid != null && fid.ByteSize != 0;
-                    #if TMNEXT
-                    fidIsValid = @fid != null && fid.TimeWrite != "?";
-                    #endif
-
+#endif
                     if (fidIsValid)
                     {
                         foundFids.InsertLast(FidData(fid, pathsToTry[k], methods[j]));
