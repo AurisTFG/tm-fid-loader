@@ -99,7 +99,7 @@ namespace Utils
         array<string> lines = textInput.Split("\n");
         for (uint i = 0; i < lines.Length; i++)
         {
-            if (lines[i] == "" || lines[i].StartsWith("//") )
+            if (lines[i] == "" || lines[i].StartsWith("//"))
                 continue;
 
             string trimmed = lines[i].Trim().Replace("\"", "").Replace(",", "");

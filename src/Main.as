@@ -124,7 +124,8 @@ void RenderMainWindow()
 			UI::TableSetColumnIndex(2); UI::Text(foundFids[i].fid.ByteSize + " B");
 			UI::TableSetColumnIndex(3);
 
-			if (!OPExtractPermission) UI::PushStyleColor(UI::Col::Button, RedColor);
+			if (!OPExtractPermission) 
+				MyUI::RedButtonStyleColor();
 			if (UI::Button("Extract##" + i))
 			{
 				if (OPExtractPermission)
@@ -140,9 +141,13 @@ void RenderMainWindow()
 				}
 			}
 			UI::SameLine();
-			if (!OPExtractPermission) UI::PopStyleColor();
+			MyUI::PopStyleColors();
 
-			if (!OPDevMode || !OPExtractPermission || @foundFids[i].nod == null) UI::PushStyleColor(UI::Col::Button, RedColor);
+			
+			if(!OPDevMode)
+				MyUI::OrangeButtonStyleColor();
+			if (!OPExtractPermission || @foundFids[i].nod == null) 
+				MyUI::RedButtonStyleColor();
 			if (UI::Button("Nod##" + i))
 			{
 				if (OPDevMode && OPExtractPermission && @foundFids[i].nod != null)
@@ -155,33 +160,33 @@ void RenderMainWindow()
 				{
 					MyUI::TextFadeStart("Club access is required to Explore Nods.", LogLevel::Error);
 				}
-				else if (!OPDevMode)
-				{
-					MyUI::TextFadeStart("Enable Developer Mode in Openplanet to Explore Nods.", LogLevel::Warning);
-				}
 				else if (@foundFids[i].nod == null)
 				{
 					MyUI::TextFadeStart("Failed to preload nod for " + "\"" + foundFids[i].filePath + "\"", LogLevel::Error);
 				}
+				else if (!OPDevMode)
+				{
+					MyUI::TextFadeStart("Enable Developer Mode in Openplanet to Explore Nods.", LogLevel::Warning);
+				}
 			}
 			UI::SameLine();
-			if (!OPDevMode || !OPExtractPermission || @foundFids[i].nod == null) UI::PopStyleColor();
+			MyUI::PopStyleColors();
 
-			string folder = foundFids[i].folderPath;
-			if (!IO::FolderExists(folder)) UI::PushStyleColor(UI::Col::Button, RedColor);
+			if (!IO::FolderExists(foundFids[i].folderPath)) 
+				MyUI::RedButtonStyleColor();
 			if (UI::Button("Open Folder##" + i))
 			{
-				if (IO::FolderExists(folder))
+				if (IO::FolderExists(foundFids[i].folderPath))
 				{
-					MyUI::TextFadeStart("Opening folder " + "\"" + folder + "\"");
-					OpenExplorerPath(folder);
+					MyUI::TextFadeStart("Opening folder " + "\"" + foundFids[i].folderPath + "\"");
+					OpenExplorerPath(foundFids[i].folderPath);
 				}
 				else
 				{
-					MyUI::TextFadeStart("Folder " + "\"" + folder + "\" does not exist. Extract the file to create it.", LogLevel::Error);
+					MyUI::TextFadeStart("Folder " + "\"" + foundFids[i].folderPath + "\" does not exist. Extract the file to create it.", LogLevel::Error);
 				}	
 			}
-			if (!IO::FolderExists(folder)) UI::PopStyleColor();
+			MyUI::PopStyleColors();
 
 		}
 		UI::EndTable();
