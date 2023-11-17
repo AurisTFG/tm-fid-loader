@@ -108,6 +108,7 @@ namespace Utils
                 continue;
 
             string trimmed = lines[i].Trim().Replace("\"", "").Replace(",", "");
+            trimmed = trimmed.Replace("\\", "/"); // fix for Turbo, other games accept both, but only Turbo accepts / only
             if (trimmed.Length > 0 && filePaths.Find(trimmed) == -1)
             {
                 filePaths.InsertLast(trimmed);
