@@ -17,7 +17,11 @@ checksum.txt
 Media\Texture\HotGrid.Texture.gbx
 """;
 
+#if TMNEXT
 const bool OPExtractPermission = OpenplanetHasFullPermissions();
+#else
+const bool OPExtractPermission = true;
+#endif
 const bool OPDevMode = Meta::IsDeveloperMode();
 const vec4 customBorderColor = vec4(UI::GetStyleColor(UI::Col::Button).xyz, 1.0f);
 
