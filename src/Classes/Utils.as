@@ -6,8 +6,10 @@ namespace Utils
     {
         print("Searching for fids...");
 
-		@foundFids = Utils::SearchForFids(textInput);
-		if (foundFids.Length != 0)
+        array<FidData>@ fids = SearchForFids();
+        @foundFids = fids;
+
+		if (fids.Length != 0)
 		{
 			string text = "Found " + foundFids.Length + ((foundFids.Length == 1) ? " file!" : " files!");
 			MyUI::TextFadeStart(text, LogLevel::Success);
@@ -42,15 +44,20 @@ namespace Utils
         MyUI::TextFadeStart("Successfully extracted " + extractedCount + "/" + filesCount + "! (" + Text::Format("%.2f", percent) + "%)", LogLevel::Success);
     }
 
-    array<FidData>@ SearchForFids(const string &in text)
+    array<FidData>@ SearchForFids()
     {
-        array<FidData>@ foundFids = array<FidData>();
-        array<string>@ filePaths = ParseFilePaths(text);
+        array<FidData>@ fids = array<FidData>();
+        array<string>@ filePaths = GetFilePaths();
         array<bool> methodSettings = GetSettings();
 
         for (uint i = 0; i < filePaths.Length; i++)
         {
-            bool found = false;
+            if (i % 100 == 0)
+            {
+                print(i);
+                yield();
+            }
+
             for (uint j = 0; j < methods.Length; j++)
             {
                 if (!methodSettings[j])
@@ -81,39 +88,43 @@ namespace Utils
 #endif
                     if (fidIsValid)
                     {
-                        foundFids.InsertLast(FidData(fid, pathsToTry[k], methods[j]));
-                        found = true;
+                        fids.InsertLast(FidData(fid, pathsToTry[k], methods[j]));
                         break;
                     }
                 }
             }
-
-            if (!found)
-            {
-                print("Could not find fid for file: " + filePaths[i]);
-            }
         }
 
-        return foundFids;
+        return fids;
     }
 
-    array<string>@ ParseFilePaths(const string &in text)
+    array<string>@ GetFilePaths()
     {
         array<string>@ filePaths = array<string>();
 
         array<string> lines = textInput.Split("\n");
         for (uint i = 0; i < lines.Length; i++)
         {
+            if (i % 1000 == 0)
+                yield();
+
             if (lines[i] == "" || lines[i].StartsWith("//"))
                 continue;
 
-            string trimmed = lines[i].Trim().Replace("\"", "").Replace(",", "");
-            trimmed = trimmed.Replace("\\", "/"); // fix for Turbo, other games accept both, but only Turbo accepts / only
-            if (trimmed.Length > 0 && filePaths.Find(trimmed) == -1)
-            {
-                filePaths.InsertLast(trimmed);
-            }
-        }  
+            string trimmed = lines[i].Trim();
+#if TURBO
+            trimmed = trimmed.Replace("\\", "/"); // backslashes dont work in Turbo
+#endif
+            // if (Setting_GetGame && !trimmed.StartsWith("GameData/"))
+            //     filePaths.InsertLast("GameData/" + trimmed);
+            // if (Setting_GetFake && !trimmed.StartsWith("GameData/"))
+            //     trimmed = trimmed.Substr(9);
+            // else if (trimmed.StartsWith("Titles/Trackmania/"))
+            //     trimmed = trimmed.Substr(18);
+            // else if (trimmed.StartsWith("Titles/Trackmania/Scripts/"))
+            //     trimmed = trimmed.Substr(27);
+            filePaths.InsertLast(trimmed);
+        }
 
         return filePaths;
     }

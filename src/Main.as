@@ -1,4 +1,3 @@
-
 const string pluginName = Meta::ExecutingPlugin().Name;
 const string defaultText = "*Type file paths here*";
 const string exampleText = """
@@ -23,7 +22,7 @@ const bool OPExtractPermission = OpenplanetHasFullPermissions();
 const bool OPExtractPermission = true;
 #endif
 const bool OPDevMode = Meta::IsDeveloperMode();
-const vec4 customBorderColor = vec4(UI::GetStyleColor(UI::Col::Button).xyz, 1.0f);
+const vec4 customBorderColor = vec4(UI::GetStyleColor(UI::Col::Button).xyz, 1.0f); // TODO: make this the normal button color, also force button color.
 
 string windowLabel = "\\$b1f" + Icons::FolderOpen + "\\$z " + pluginName;
 string textInput = defaultText;
@@ -34,8 +33,29 @@ void Main()
 	if (pluginName.EndsWith("(dev)"))
 	{
 		textInput = exampleText;
-		windowLabel = "\\$b1f" + Icons::FolderOpen + "\\$z\\$d00 " + pluginName;
+		windowLabel = "\\$b1f" + Icons::FolderOpen + "\\$d00 " + pluginName;
 		Setting_WindowOpen = true;
+	}
+
+	auto fid = Fids::GetFake("GameData/MaterialLib_Stadium.txt");
+	if (@fid != null)
+	{
+		trace("Fid exists!!");
+		Fids::Extract(fid);
+	}
+
+	auto folder = Fids::GetGameFolder("");
+	if (folder != null)
+	{
+		print("Folder Exists!");
+		for (uint i = 0; i < folder.Leaves.Length; i++)
+		{
+			print(folder.Leaves[i].FullFileName);
+		}
+		for (uint i = 0; i < folder.Trees.Length; i++)
+		{
+			print(folder.Trees[i].FullDirName);
+		}
 	}
 }
 
@@ -48,7 +68,7 @@ void RenderMenu()
 void RenderInterface()
 {
 	if (Setting_WindowOpen) 
-		RenderMainWindow();
+		RenderWindow();
 }
 
 void Update(float dt)
@@ -56,7 +76,7 @@ void Update(float dt)
 	MyUI::TextFadeUpdate(dt);
 }
 
-void RenderMainWindow()
+void RenderWindow()
 {
 	UI::SetNextWindowSize(920, 600);
 	UI::Begin(windowLabel, Setting_WindowOpen, UI::WindowFlags::NoCollapse);
@@ -104,7 +124,7 @@ void RenderMainWindow()
 
 	MyUI::TextFadeRender();
 
-	if (foundFids.Length == 0)
+	if (foundFids.Length == 0 || Setting_DisableTableRender)
 	{
 		UI::End();
 		return;
