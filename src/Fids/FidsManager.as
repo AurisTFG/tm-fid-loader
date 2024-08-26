@@ -109,6 +109,8 @@ namespace FidsManager
 	void SearchForFidsCoro() 
 	{ 
 		foundFids = SearchForFids(); 
+
+		Fids::UpdateTree(Fids::GetGameFolder(""));
 		
 		if (foundFids.Length == 0)
 		{
