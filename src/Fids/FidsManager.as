@@ -52,7 +52,7 @@ namespace FidsManager
 		}
 		
 		UI::PushStyleColor(UI::Col::TableBorderStrong, Colors::Button);
-		if (UI::BeginTable("FidsTable", 4, UI::TableFlags::SizingFixedFit | UI::TableFlags::Borders | UI::TableFlags::ScrollY | UI::TableFlags::RowBg))
+		if (UI::BeginTable("FidsTable", 4, UI::TableFlags::SizingFixedFit | UI::TableFlags::Borders | UI::TableFlags::ScrollY | UI::TableFlags::RowBg, vec2(0, 244)))
 		{
 			UI::TableSetupScrollFreeze(0, 1);
 
