@@ -1,4 +1,6 @@
-[Setting category="General" name="Window Open"]
+// --- General ---
+
+[Setting hidden category="General" name="Window Open"]
 bool Setting_WindowOpen = false;
 
 [Setting category="General" name="Extract with Hook Method" description="Hook method can help you to extract .gbx files that would usually get corrupted when extracting from .paks. However, this method will not always work and may even cause a game crash"]
@@ -7,6 +9,7 @@ bool Setting_HookMethod = false;
 [Setting category="General" name="Disable Table Rendering" description="Enable this option if you don't want to render the table when loading huge amount of files"]
 bool Setting_DisableTableRender = false;
 
+// --- Functions ---
 
 [Setting category="Functions" name="GetFake" description="Gets a file from the main TitlePack, e.g.: Trackmania.Title.Pack.gbx"]
 bool Setting_GetFake = true;
