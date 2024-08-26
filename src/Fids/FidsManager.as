@@ -18,12 +18,11 @@ namespace FidsManager
 	{
 		if (!Setting_WindowOpen) 
 			return;
-			
-		UI::SetNextWindowSize(920, 600);
-		UI::Begin(windowLabel, Setting_WindowOpen, UI::WindowFlags::NoCollapse);
 
-		_UI::PushBorderStyle(1.5f);
-		textInput = UI::InputTextMultiline("##textInput", textInput, vec2(900, 200));
+		UI::Begin(windowLabel, Setting_WindowOpen, UI::WindowFlags::NoCollapse | UI::WindowFlags::AlwaysAutoResize);
+
+		_UI::PushBorderStyle();
+		textInput = UI::InputTextMultiline("##textInput", textInput, vec2(425, 200));
 		_UI::PopBorderStyle();
 
 		if (UI::Button(Icons::Search + " Search"))
@@ -51,29 +50,34 @@ namespace FidsManager
 			UI::End();
 			return;
 		}
-
-		if (UI::BeginTable("FidsTable", 4, UI::TableFlags::Resizable | UI::TableFlags::Borders))
+		
+		UI::PushStyleColor(UI::Col::TableBorderStrong, Colors::Button);
+		if (UI::BeginTable("FidsTable", 4, UI::TableFlags::SizingFixedFit | UI::TableFlags::Borders | UI::TableFlags::ScrollY | UI::TableFlags::RowBg))
 		{
+			UI::TableSetupScrollFreeze(0, 1);
+
+			UI::TableSetupColumn("Method");
+			UI::TableSetupColumn("File path");
+			UI::TableSetupColumn("Size");
+			UI::TableSetupColumn("Actions");
 			UI::TableHeadersRow();
-			
-			UI::PushStyleColor(UI::Col::Separator, Colors::Button);
-			_UI::TableHeader(0, "Method");
-			_UI::TableHeader(1, "Full file path");
-			_UI::TableHeader(2, "Size");
-			_UI::TableHeader(3, "Actions");
-			UI::PopStyleColor();
 
 			for (uint i = 0; i < foundFids.Length; i++)
 			{
+				UI::PushID(i + "");
 				UI::TableNextRow();
-				UI::TableSetColumnIndex(0); UI::Text(foundFids[i].method);
-				UI::TableSetColumnIndex(1); UI::Text(foundFids[i].filePath);
-				UI::TableSetColumnIndex(2); UI::Text(foundFids[i].fid.ByteSize + " B");
-				UI::TableSetColumnIndex(3);
+				
+				UI::TableNextColumn();
+				UI::Text(foundFids[i].method);
+				UI::TableNextColumn();
+				UI::Text(foundFids[i].filePath);
+				UI::TableNextColumn();
+				UI::Text(foundFids[i].fid.ByteSize + " B");
+				UI::TableNextColumn();
 
 				if (!OPExtractPermission) 
 					_UI::PushRedButtonColor();
-				if (UI::Button("Extract##" + i))
+				if (UI::Button("Extract"))
 					foundFids[i].Extract();
 				_UI::PopButtonColors();
 				UI::SameLine();
@@ -82,22 +86,23 @@ namespace FidsManager
 					_UI::PushOrangeButtonColor();
 				if (!OPExtractPermission || @foundFids[i].fid.Nod == null) 
 					_UI::PushRedButtonColor();
-				if (UI::Button("Nod##" + i))
+				if (UI::Button("Nod"))
 					foundFids[i].ExploreNodForFid();
 				_UI::PopButtonColors();
 				UI::SameLine();
 
 				if (!IO::FolderExists(foundFids[i].folderPath)) 
 					_UI::PushRedButtonColor();
-				if (UI::Button("Open Folder##" + i))
+				if (UI::Button("Open Folder"))
 					foundFids[i].OpenFolder();
 				_UI::PopButtonColors();
 
+				UI::PopID();
 			}
 			UI::EndTable();
 		}
+		UI::PopStyleColor();
 
-		UI::GetWindowDrawList().AddRect(UI::GetItemRect(), Colors::Button, 2.0f, 1.75f);
 		UI::End();
 	}
 

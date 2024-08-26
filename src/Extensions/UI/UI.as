@@ -1,14 +1,5 @@
 namespace _UI
 {
-    void TableHeader(const int &in column, const string &in text)
-    {
-        UI::TableSetColumnIndex(column); 
-        UI::TableHeader(text); 
-        PushSeparatorColor();
-        UI::Separator();
-        PopSeparatorColor();
-    }
-
     void Tooltip(const string &in msg, int width = 400, bool questionMark = true) 
     {
         if (questionMark)
@@ -35,15 +26,6 @@ namespace _UI
     {
         UI::PopStyleColor();
         UI::PopStyleVar();
-    }
-
-    void PushSeparatorColor()
-    {
-        UI::PushStyleColor(UI::Col::Separator, Colors::Button);
-    }
-    void PopSeparatorColor()
-    {
-        UI::PopStyleColor();
     }
     
     int buttonColorStackCount = 0;
