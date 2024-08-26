@@ -8,15 +8,17 @@ enum LogLevel
 
 namespace TextFade
 { 
-    const float durationMs = 3000.0f;
-    vec4 currentColor = Colors::White;
-    string currentText = "";
-    bool keepEmptySpace = true;
+    namespace _
+    {
+        float Duration = 3000.0f; // 3 seconds
+        vec4 Color = Colors::White;
+        string Text = "";
+    }
 
     void Start(const string &in text, LogLevel level = LogLevel::Info, bool printToLog = true)
     {
-        currentText = text;
-        currentColor = Colors::LogLevels[level];
+        _::Text = text;
+        _::Color = Colors::LogLevels[level];
 
         if (printToLog)
         {
@@ -40,25 +42,24 @@ namespace TextFade
     
     void Stop()
     {
-        currentText = "";
-        currentColor.w = 0.0f;
+        _::Text = "";
+        _::Color.w = 1.0f;
     }
 
     void Render()
     {
-        if (currentColor.w <= 0.0f && !keepEmptySpace)
-            return;
-            
-        UI::PushStyleColor(UI::Col::Text, currentColor);
-        UI::Text(currentText);
+        UI::PushStyleColor(UI::Col::Text, _::Color);
+        UI::Text(_::Text);
         UI::PopStyleColor();
     }
 
     void Update(float dt)
     {
-        if (currentText == "" || currentColor.w <= 0.0f)
+        if (_::Text == "")
             return;
         
-        currentColor.w -= dt / durationMs;
+        _::Color.w -= dt / _::Duration;
+        if (_::Color.w <= 0.0f)
+            Stop();
     }
 }

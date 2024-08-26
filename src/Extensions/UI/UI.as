@@ -4,10 +4,12 @@ namespace _UI
     {
         UI::TableSetColumnIndex(column); 
         UI::TableHeader(text); 
+        PushSeparatorColor();
         UI::Separator();
+        PopSeparatorColor();
     }
 
-    void AddTooltipOfWidth(const string &in msg, int width = 400, bool questionMark = true) 
+    void Tooltip(const string &in msg, int width = 400, bool questionMark = true) 
     {
         if (questionMark)
         {
