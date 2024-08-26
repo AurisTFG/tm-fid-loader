@@ -1,22 +1,16 @@
 namespace FidsManager
 {
 	array<FidData>@ foundFids = array<FidData>();
-	string label = windowLabel;
 	string textInput = defaultText;
 
 	void Init()
     {
-		if (DEV)
-		{
-			textInput = exampleText;
-			label = windowLabelDev;
-			Setting_WindowOpen = true;
-		}
+		foundFids = array<FidData>();
     }
 
 	void MenuItem()
 	{
-		if (UI::MenuItem(label, "", Setting_WindowOpen))
+		if (UI::MenuItem(windowLabel, "", Setting_WindowOpen))
 			Setting_WindowOpen = !Setting_WindowOpen;
 	}
 
@@ -26,7 +20,7 @@ namespace FidsManager
 			return;
 			
 		UI::SetNextWindowSize(920, 600);
-		UI::Begin(label, Setting_WindowOpen, UI::WindowFlags::NoCollapse);
+		UI::Begin(windowLabel, Setting_WindowOpen, UI::WindowFlags::NoCollapse);
 
 		_UI::PushBorderStyle(1.5f);
 		textInput = UI::InputTextMultiline("##textInput", textInput, vec2(900, 200));
@@ -86,7 +80,7 @@ namespace FidsManager
 				
 				if(!OPDevMode)
 					_UI::PushOrangeButtonColor();
-				if (!OPExtractPermission || @foundFids[i].nod == null) 
+				if (!OPExtractPermission || @foundFids[i].fid.Nod == null) 
 					_UI::PushRedButtonColor();
 				if (UI::Button("Nod##" + i))
 					foundFids[i].ExploreNodForFid();

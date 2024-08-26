@@ -3,7 +3,6 @@ class FidData
 	CSystemFidFile@ fid;
 	string filePath;
 	string method;
-	CMwNod@ nod;
 	string folderPath;
 
 	FidData() { }
@@ -13,7 +12,6 @@ class FidData
 		this.filePath = _filePath;
 		this.method = _method;
 
-		@nod = Fids::Preload(fid);
 		folderPath = IO::FromDataFolder("Extract/" + filePath.Replace(fid.FileName, ""));
 	}
 
@@ -33,10 +31,10 @@ class FidData
 
     void PreloadNod()
     {
-        if (@nod != null)
+        if (@fid.Nod != null)
             return;
 
-        @nod = Fids::Preload(fid);
+        Fids::Preload(fid);
     }
 
     void ExploreNodForFid()
@@ -52,17 +50,14 @@ class FidData
             return;
         }
 
-        if (@nod == null)
+        PreloadNod();
+        if (@fid.Nod == null)
         {
-            PreloadNod();
-            if (@nod == null)
-            {
-                TextFade::Start("Failed to preload nod for " + "\"" + this.filePath + "\"", LogLevel::Error);
-                return;
-            }
+            TextFade::Start("Failed to preload nod for " + "\"" + this.filePath + "\"", LogLevel::Error);
+            return;
         }
 
-        ExploreNod(this.fid.FileName, this.nod); 
+        ExploreNod(this.fid.FileName, this.fid.Nod); 
         TextFade::Start("Opening Nod Explorer for fid " + "\"" + this.filePath + "\"", LogLevel::Success);
     }
 
