@@ -1,15 +1,11 @@
 // --- General ---
 
-[Setting hidden category="General" name="Window Open"]
-bool Setting_WindowOpen = false;
-
-[Setting category="General" name="test"]
-string Setting_TextInput = "*Type file paths here*";
-
 [Setting category="General" name="Extract with Hook Method" description="Hook method can help you to extract .gbx files that would usually get corrupted when extracting from .paks. However, this method will not always work and may even cause a game crash"]
 bool Setting_HookMethod = false;
 
-[Setting category="General" name="Disable Table Rendering" description="Enable this option if you don't want to render the table when loading huge amount of files"]
+// --- Performance ---
+
+[Setting category="Performance" name="Disable Table Rendering" description="Enable this option if you don't want to render the table when loading huge amount of files"]
 bool Setting_DisableTableRender = false;
 
 // --- Functions ---
@@ -28,3 +24,11 @@ bool Setting_GetUser = true;
 
 [Setting category="Functions" name="GetProgramData" description="Gets a file from the ProgramData directory of the game, e.g.: \"C:/ProgramData/Trackmania2020/\""]
 bool Setting_GetProgramData = true;
+
+// --- Hidden Settings ---
+
+[Setting hidden]
+bool Setting_WindowOpen = false;
+
+[Setting hidden]
+string Setting_TextInput = "*Type file paths here*";
