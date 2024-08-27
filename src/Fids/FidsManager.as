@@ -1,7 +1,6 @@
 namespace FidsManager
 {
-	array<FidData> foundFids = array<FidData>();
-	string textInput = defaultText;
+	array<FidData> foundFids;
 
 	void Init()
     {
@@ -22,7 +21,7 @@ namespace FidsManager
 		UI::Begin(windowLabel, Setting_WindowOpen, UI::WindowFlags::NoCollapse | UI::WindowFlags::AlwaysAutoResize);
 
 		_UI::PushBorderStyle();
-		textInput = UI::InputTextMultiline("##textInput", textInput, vec2(425, 200));
+		Setting_TextInput = UI::InputTextMultiline("##textInput", Setting_TextInput, vec2(425, 200));
 		_UI::PopBorderStyle();
 
 		if (UI::Button(Icons::Search + " Search"))
@@ -113,7 +112,7 @@ namespace FidsManager
 	void SearchForFidsCoro() 
 	{ 
 		foundFids = array<FidData>();
-        array<string> filePaths = GetFilePaths(textInput);
+        array<string> filePaths = GetFilePaths(Setting_TextInput);
         array<bool> methodSettings = { Setting_GetFake, Setting_GetGame, Setting_GetResource, Setting_GetUser, Setting_GetProgramData };
 
         for (uint i = 0; i < filePaths.Length; i++)
@@ -146,7 +145,7 @@ namespace FidsManager
             }
         }
 
-		Fids::UpdateTree(Fids::GetGameFolder(""));
+		Fids::UpdateTree(Fids::GetGameFolder("")); // Cool "fix" to get rid of fake files that get added to fid explorer after search
 		
 		if (foundFids.Length == 0)
 		{
@@ -159,7 +158,7 @@ namespace FidsManager
 
 	void LoadExample()
 	{
-		textInput = exampleText;
+		Setting_TextInput = exampleText;
 		TextFade::Start("Loaded an example.");
 	}
 
@@ -213,7 +212,7 @@ namespace FidsManager
 
 	void Clear()
 	{
-		textInput = "";
+		Setting_TextInput = "";
 		foundFids = array<FidData>();
 		TextFade::Stop();
 	}

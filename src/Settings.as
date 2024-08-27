@@ -3,6 +3,9 @@
 [Setting hidden category="General" name="Window Open"]
 bool Setting_WindowOpen = false;
 
+[Setting category="General" name="test"]
+string Setting_TextInput = "*Type file paths here*";
+
 [Setting category="General" name="Extract with Hook Method" description="Hook method can help you to extract .gbx files that would usually get corrupted when extracting from .paks. However, this method will not always work and may even cause a game crash"]
 bool Setting_HookMethod = false;
 

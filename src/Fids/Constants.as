@@ -10,8 +10,6 @@ const array<string> methods = { "GetFake", "GetGame", "GetResource", "GetUser", 
 
 const string windowLabel = "\\$b1f" + Icons::FolderOpen + (DEV ? "\\$d00" : "\\$z") + " Fid Loader" + (DEV ? " (Dev)" : "");
 
-const string defaultText = "*Type file paths here*";
-
 #if TMNEXT
 const string exampleText = """
 // GetFake:
