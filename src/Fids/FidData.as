@@ -37,7 +37,7 @@ class FidData
         Fids::Preload(fid);
     }
 
-    void ExploreNodForFid()
+    void OpenNodExplorer()
     {
         if (!OPExtractPermission)
         {

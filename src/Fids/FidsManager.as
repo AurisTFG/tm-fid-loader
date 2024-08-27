@@ -1,6 +1,6 @@
 namespace FidsManager
 {
-	array<FidData>@ foundFids = array<FidData>();
+	array<FidData> foundFids = array<FidData>();
 	string textInput = defaultText;
 
 	void Init()
@@ -38,6 +38,10 @@ namespace FidsManager
 		if (UI::Button(Icons::FilesO + " Extract All Files"))
 			startnew(ExtractAllFilesCoro);
 		_UI::PopButtonColors();
+		UI::SameLine();
+
+		if (UI::Button(Icons::History + " Preload All Nods"))
+			startnew(PreloadAllNodsCoro);
 		UI::SameLine();
 
 		if (UI::Button(Icons::TrashO + " Clear"))
@@ -87,7 +91,7 @@ namespace FidsManager
 				if (!OPExtractPermission || @foundFids[i].fid.Nod == null) 
 					_UI::PushRedButtonColor();
 				if (UI::Button("Nod"))
-					foundFids[i].ExploreNodForFid();
+					foundFids[i].OpenNodExplorer();
 				_UI::PopButtonColors();
 				UI::SameLine();
 
@@ -108,22 +112,7 @@ namespace FidsManager
 
 	void SearchForFidsCoro() 
 	{ 
-		foundFids = SearchForFids(); 
-
-		Fids::UpdateTree(Fids::GetGameFolder(""));
-		
-		if (foundFids.Length == 0)
-		{
-			TextFade::Start("Did not find any files.", LogLevel::Error);
-			return;
-		}
-	
-		TextFade::Start("Found " + foundFids.Length + ((foundFids.Length == 1) ? " file!" : " files!"), LogLevel::Success);
-	}
-
-	array<FidData> SearchForFids()
-    {
-        array<FidData> fids = array<FidData>();
+		foundFids = array<FidData>();
         array<string> filePaths = GetFilePaths(textInput);
         array<bool> methodSettings = { Setting_GetFake, Setting_GetGame, Setting_GetResource, Setting_GetUser, Setting_GetProgramData };
 
@@ -150,15 +139,23 @@ namespace FidsManager
 
 				if (fidIsValid)
 				{
-					fids.InsertLast(FidData(fid, filePath, methods[j]));
+					foundFids.InsertLast(FidData(fid, filePath, methods[j]));
 					break;
 				}
                 
             }
         }
 
-		return fids;
-    }
+		Fids::UpdateTree(Fids::GetGameFolder(""));
+		
+		if (foundFids.Length == 0)
+		{
+			TextFade::Start("Did not find any files.", LogLevel::Error);
+			return;
+		}
+	
+		TextFade::Start("Found " + foundFids.Length + ((foundFids.Length == 1) ? " file!" : " files!"), LogLevel::Success);
+	}
 
 	void LoadExample()
 	{
@@ -168,7 +165,19 @@ namespace FidsManager
 
 	void ExtractAllFilesCoro() 
 	{ 
-		uint count = ExtractAllFiles(); 
+		if (!OPExtractPermission)
+		{
+			TextFade::Start("Club access is required to extract files.", LogLevel::Error);
+			return;
+		}
+
+        uint count = 0;
+
+        for (uint i = 0; i < foundFids.Length; i++)
+        {
+            if (Fids::Extract(foundFids[i].fid, Setting_HookMethod))
+            	count++;
+        }
 
 		if (count == 0)
 		{
@@ -176,28 +185,31 @@ namespace FidsManager
 			return;
 		}
 
-		float percent = count / foundFids.Length * 100.0;
+		float percent = float(count) / foundFids.Length * 100;
         TextFade::Start("Successfully extracted " + count + "/" + foundFids.Length + "! (" + Text::Format("%.2f", percent) + "%)", LogLevel::Success);
 	}
 
-	uint ExtractAllFiles()
-    {
-		if (!OPExtractPermission)
+	void PreloadAllNodsCoro()
+	{
+		int count = 0;
+
+		for (uint i = 0; i < foundFids.Length; i++)
 		{
-			TextFade::Start("Club access is required to extract files.", LogLevel::Error);
-			return 0;
+			foundFids[i].PreloadNod();
+
+			if (@foundFids[i].fid.Nod != null)
+				count++;
 		}
 
-        uint extractedCount = 0;
+		if (count == 0)
+		{
+			TextFade::Start("Did not manage to preload any nods.", LogLevel::Error);
+			return;
+		}
 
-        for (uint i = 0; i < foundFids.Length; i++)
-        {
-            if (Fids::Extract(foundFids[i].fid, Setting_HookMethod))
-            	extractedCount++;
-        }
-
-		return extractedCount;
-    }
+		float percent = float(count) / foundFids.Length * 100;
+		TextFade::Start("Successfully preloaded " + count + "/" + foundFids.Length + " nods! (" + Text::Format("%.2f", percent) + "%)", LogLevel::Success);
+	}
 
 	void Clear()
 	{
@@ -205,7 +217,6 @@ namespace FidsManager
 		foundFids = array<FidData>();
 		TextFade::Stop();
 	}
-
 
 	array<string> GetFilePaths(const string &in multilineInput)
 	{
