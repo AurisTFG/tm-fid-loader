@@ -212,7 +212,6 @@ namespace FidsManager
 
 	void Clear()
 	{
-		Setting_TextInput = "";
 		foundFids = array<FidData>();
 		TextFade::Stop();
 	}
