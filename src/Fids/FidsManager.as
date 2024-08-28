@@ -1,11 +1,11 @@
-namespace FidsManager
+namespace FidLoader
 {
-	array<FidData> fids;
+	array<FidWrapper> fids;
 	bool fidsDirty = false;
 
 	void Init()
     {
-		fids = array<FidData>();
+		fids = array<FidWrapper>();
     }
 
 	void MenuItem()
@@ -46,7 +46,7 @@ namespace FidsManager
 
 		if (UI::Button(Icons::TrashO + " Clear"))
 			Clear();
-
+		
 		TextFade::Render();
 
 		if (fids.Length == 0 || Setting_DisableTableRender)
@@ -55,68 +55,95 @@ namespace FidsManager
 			return;
 		}
 		
+		int columnCount = 4;
 		int tableFlags = 
 			UI::TableFlags::Borders | 
 			UI::TableFlags::RowBg |
 			UI::TableFlags::SizingFixedFit | 
 			UI::TableFlags::ScrollY | 
 			UI::TableFlags::Sortable | 
-			UI::TableFlags::SortMulti;
+			UI::TableFlags::SortMulti |
+			UI::TableFlags::SortTristate;
+		vec2 tableSize = vec2(0, 298);
 
 		UI::PushStyleColor(UI::Col::TableBorderStrong, Colors::Button);
-		if (UI::BeginTable("Fids", 4, tableFlags, vec2(0, 244)))
+		UI::PushStyleVar(UI::StyleVar::CellPadding, vec2(5, 5));
+		if (UI::BeginTable("Fids", columnCount, tableFlags, tableSize))
 		{
 			UI::TableSetupScrollFreeze(0, 1);
 
-			UI::TableSetupColumn("Method", UI::TableColumnFlags::DefaultSort);
-			UI::TableSetupColumn("File path", UI::TableColumnFlags::WidthStretch | UI::TableColumnFlags::DefaultSort);
-			UI::TableSetupColumn("Size", UI::TableColumnFlags::DefaultSort);
-			UI::TableSetupColumn("Actions", UI::TableColumnFlags::NoSort);
-			UI::TableHeadersRow();
+			UI::TableSetupColumn("Method",    UI::TableColumnFlags::None, 0.0f, FidWrapperColumnID::Method);
+			UI::TableSetupColumn("File path", UI::TableColumnFlags::WidthStretch, 0.0f, FidWrapperColumnID::FilePath);
+			UI::TableSetupColumn("Size",      UI::TableColumnFlags::None, 0.0f, FidWrapperColumnID::FileSize);
+			UI::TableSetupColumn("Actions",   UI::TableColumnFlags::NoSort, 0.0f, FidWrapperColumnID::Actions);
+
+			UI::TableNextRow(UI::TableRowFlags::Headers);
+            for (int i = 0; i < UI::TableGetColumnCount(); i++)
+            {
+                UI::TableSetColumnIndex(i);
+				if (i == FidWrapperColumnID::Actions)
+				{
+					UI::BeginDisabled();
+                	UI::TableHeader(UI::TableGetColumnName(i));
+					UI::EndDisabled();
+				}
+				else
+				{
+					UI::TableHeader(UI::TableGetColumnName(i));
+				}
+            }
 
 			auto sortSpecs = UI::TableGetSortSpecs();
 			if (sortSpecs !is null && (sortSpecs.Dirty || fidsDirty))
-				SortItems(sortSpecs);
-
+			{
+				@g_currentSortSpecs = sortSpecs;
+				fids.Sort(function(a, b) { return a.CompareWithSortSpec(b) > 0; });
+				sortSpecs.Dirty = false;
+				fidsDirty = false;
+				@g_currentSortSpecs = null;
+			}
+			
 			for (uint i = 0; i < fids.Length; i++)
 			{
-				UI::PushID(fids[i]);
-				UI::TableNextRow();
+				auto fid = fids[i];
+
+				UI::PushID(fid);
 				
 				UI::TableNextColumn();
-				UI::Text(fids[i].method);
+				UI::Text(fid.method);
 				UI::TableNextColumn();
-				UI::Text(fids[i].filePath);
+				UI::Text(fid.filePath);
 				UI::TableNextColumn();
-				UI::Text(fids[i].fid.ByteSize + " B");
+				UI::Text(fid.fid.ByteSize + " B");
 				UI::TableNextColumn();
 
 				if (!OPExtractPermission) 
 					_UI::PushRedButtonColor();
 				if (UI::Button("Extract"))
-					fids[i].Extract();
+					fid.Extract();
 				_UI::PopButtonColors();
 				UI::SameLine();
 				
 				if(!OPDevMode)
 					_UI::PushOrangeButtonColor();
-				if (!OPExtractPermission || @fids[i].fid.Nod == null) 
+				if (!OPExtractPermission || @fid.fid.Nod == null) 
 					_UI::PushRedButtonColor();
 				if (UI::Button("Nod"))
-					fids[i].OpenNodExplorer();
+					fid.OpenNodExplorer();
 				_UI::PopButtonColors();
 				UI::SameLine();
 
-				if (!IO::FolderExists(fids[i].folderPath)) 
+				if (!IO::FolderExists(fid.folderPath)) 
 					_UI::PushRedButtonColor();
 				if (UI::Button("Open Folder"))
-					fids[i].OpenFolder();
+					fid.OpenFolder();
 				_UI::PopButtonColors();
 
 				UI::PopID();
 			}
 			UI::EndTable();
 		}
+		UI::PopStyleVar();
 		UI::PopStyleColor();
 
 		UI::End();
@@ -124,10 +151,11 @@ namespace FidsManager
 
 	void SearchForFidsCoro() 
 	{ 
-		fids = array<FidData>();
+		fids = array<FidWrapper>();
         array<string> filePaths = GetFilePaths(Setting_TextInput);
         array<bool> methodSettings = { Setting_GetFake, Setting_GetGame, Setting_GetResource, Setting_GetUser, Setting_GetProgramData };
 
+		uint id = 0;
         for (uint i = 0; i < filePaths.Length; i++)
         {
 			string filePath = filePaths[i];
@@ -151,7 +179,8 @@ namespace FidsManager
 
 				if (fidIsValid)
 				{
-					fids.InsertLast(FidData(fid, filePath, methods[j]));
+					fids.InsertLast(FidWrapper(id, fid, filePath, methods[j]));
+					id++;
 					break;
 				}
                 
@@ -228,7 +257,7 @@ namespace FidsManager
 
 	void Clear()
 	{
-		fids = array<FidData>();
+		fids = array<FidWrapper>();
 
 		TextFade::Stop();
 	}
@@ -294,42 +323,5 @@ namespace FidsManager
 
 		error("Invalid fid get method: " + method);
 		return null;
-	}
-
-	void SortItems(UI::TableSortSpecs@ sortSpecs)
-	{
-		trace("Sorting items");
-		if (fids.Length < 2)
-		{
-			sortSpecs.Dirty = false;
-			fidsDirty = false;
-			return;
-		}
-
-		auto specs = sortSpecs.Specs;
-		for (int i = specs.Length - 1; i >= 0; i--) { // Reverse loop to sort by the last column first
-			auto spec = specs[i];
-
-			if (spec.SortDirection == UI::SortDirection::None)
-				continue;
-
-			if (spec.SortDirection == UI::SortDirection::Ascending) {
-				switch (spec.ColumnIndex) {
-				case 0: fids.Sort(function(a, b) { return a.method < b.method; }); break;
-				case 1: fids.Sort(function(a, b) { return a.filePath < b.filePath; }); break;
-				case 2: fids.Sort(function(a, b) { return a.fid.ByteSize < b.fid.ByteSize; }); break;
-				}
-
-			} else if (spec.SortDirection == UI::SortDirection::Descending) {
-				switch (spec.ColumnIndex) {
-				case 0: fids.Sort(function(a, b) { return a.method > b.method; }); break;
-				case 1: fids.Sort(function(a, b) { return a.filePath > b.filePath; }); break;
-				case 2: fids.Sort(function(a, b) { return a.fid.ByteSize > b.fid.ByteSize; }); break;
-				}
-			}
-		}
-
-		sortSpecs.Dirty = false;
-		fidsDirty = false;
 	}
 }

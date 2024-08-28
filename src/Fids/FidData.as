@@ -1,19 +1,53 @@
-class FidData
-{
-	CSystemFidFile@ fid;
-	string filePath;
-	string method;
-	string folderPath;
+UI::TableSortSpecs@ g_currentSortSpecs = null;
 
-	FidData() { }
-    FidData(CSystemFidFile@ &in _fid, const string &in _filePath, const string &in _method) 
+enum FidWrapperColumnID
+{
+    Method = 0,
+    FilePath = 1,
+    FileSize = 2,
+    Actions = 3,
+}
+
+class FidWrapper
+{
+    uint id;
+	string method;
+	string filePath;
+	string folderPath;
+	CSystemFidFile@ fid;
+
+	FidWrapper() { }
+    FidWrapper(uint _id, CSystemFidFile@ &in _fid, const string &in _filePath, const string &in _method) 
 	{ 
+        this.id = _id;
 		@this.fid = _fid;
 		this.filePath = _filePath;
 		this.method = _method;
 
 		folderPath = IO::FromDataFolder("Extract/" + filePath.Replace(fid.FileName, ""));
 	}
+
+    int CompareWithSortSpec(const FidWrapper &in other) const
+    {
+        for (uint i = 0; i < g_currentSortSpecs.Specs.Length; i++)
+        {
+            auto spec = g_currentSortSpecs.Specs[i];
+
+            int delta = 0;
+            switch (spec.ColumnIndex)
+            {
+                case FidWrapperColumnID::Method:   delta = (this.method < other.method) ? -1 : (this.method > other.method) ? +1 : 0; break;
+                case FidWrapperColumnID::FilePath: delta = (this.filePath < other.filePath) ? -1 : (this.filePath > other.filePath) ? +1 : 0; break;
+				case FidWrapperColumnID::FileSize: delta = this.fid.ByteSize - other.fid.ByteSize; break;
+				default: throw("Sorting not implemented for column " + spec.ColumnIndex); break;
+            }
+
+            if (delta != 0)
+                return (spec.SortDirection == UI::SortDirection::Ascending) ? delta : -delta;
+        }
+
+        return other.id - this.id; // Fall back to original order when no sort specs are specified, useful when UI::TableFlags::SortTristate is enabled
+    }
 
     void Extract()
     {	

@@ -2,17 +2,17 @@ void Main()      { Init(); }
 void OnEnabled() { Init(); }
 void Init()
 {
-	FidsManager::Init();
+	FidLoader::Init();
 }
 
 void RenderMenu()
 {
-	FidsManager::MenuItem();
+	FidLoader::MenuItem();
 }
 
 void RenderInterface()
 {
-	FidsManager::Render();
+	FidLoader::Render();
 }
 
 void Update(float dt)
