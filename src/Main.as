@@ -5,6 +5,13 @@ void Init()
 	FidLoader::Init();
 }
 
+void OnDisabled()  { CleanUp(); }
+void OnDestroyed() { CleanUp(); }
+void CleanUp() 
+{
+    FidLoader::CleanUp();
+}
+
 void RenderMenu()
 {
 	FidLoader::MenuItem();

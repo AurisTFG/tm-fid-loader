@@ -2,11 +2,18 @@ namespace FidLoader
 {
 	array<FidWrapper> fids;
 	bool fidsDirty = false;
+	bool resetTableState = false;
 
 	void Init()
     {
-		fids = array<FidWrapper>();
+		resetTableState = true;
     }
+
+	void CleanUp()
+	{
+		fids = array<FidWrapper>();
+		TextFade::Stop();
+	}
 
 	void MenuItem()
 	{
@@ -92,6 +99,14 @@ namespace FidLoader
 					UI::TableHeader(UI::TableGetColumnName(i));
 				}
             }
+
+			if (resetTableState)
+			{
+				UI::SetScrollX(0.0f);
+				UI::SetScrollY(0.0f);
+				
+				resetTableState = false;
+			}
 
 			auto sortSpecs = UI::TableGetSortSpecs();
 			if (sortSpecs !is null && (sortSpecs.Dirty || fidsDirty))

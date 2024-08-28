@@ -57,9 +57,9 @@ class FidWrapper
             int delta = 0;
             switch (spec.ColumnIndex)
             {
-                case FidWrapperColumnID::GetFunction:   delta = this.getFunction - other.getFunction; break;
-                case FidWrapperColumnID::FilePath: delta = (this.filePath < other.filePath) ? -1 : (this.filePath > other.filePath) ? +1 : 0; break;
-				case FidWrapperColumnID::FileSize: delta = this.fid.ByteSize - other.fid.ByteSize; break;
+                case FidWrapperColumnID::GetFunction: delta = this.getFunction - other.getFunction; break;
+                case FidWrapperColumnID::FilePath:    delta = (this.filePath < other.filePath) ? -1 : (this.filePath > other.filePath) ? +1 : 0; break;
+				case FidWrapperColumnID::FileSize:    delta = this.fid.ByteSize - other.fid.ByteSize; break;
 				default: throw("Sorting not implemented for column " + spec.ColumnIndex); break;
             }
 
