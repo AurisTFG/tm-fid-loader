@@ -1,28 +1,49 @@
 UI::TableSortSpecs@ g_currentSortSpecs = null;
+uint g_idCounter = 0;
+string GetFunctionName(FidsGetFunction method) { return FidsGetFunctions[method]; }
 
 enum FidWrapperColumnID
 {
-    Method = 0,
+    GetFunction = 0,
     FilePath = 1,
     FileSize = 2,
     Actions = 3,
 }
 
+enum FidsGetFunction
+{
+    Fake = 0,
+    Game = 1,
+    ProgramData = 2,
+    Resource = 3,
+    User = 4,
+    None = 5,
+}
+const array<string> FidsGetFunctions = { 
+    "Fake", 
+    "Game", 
+    "ProgramData", 
+    "Resource", 
+    "User",
+    "None",
+};
+
 class FidWrapper
 {
+	CSystemFidFile@ fid = null;
+
     uint id;
-	string method;
 	string filePath;
 	string folderPath;
-	CSystemFidFile@ fid;
+	FidsGetFunction getFunction = FidsGetFunction::None;
 
 	FidWrapper() { }
-    FidWrapper(uint _id, CSystemFidFile@ &in _fid, const string &in _filePath, const string &in _method) 
-	{ 
-        this.id = _id;
+    FidWrapper(CSystemFidFile@ &in _fid, const string &in _filePath, FidsGetFunction _function) 
+	{
+        this.id = g_idCounter++;
 		@this.fid = _fid;
 		this.filePath = _filePath;
-		this.method = _method;
+		this.getFunction = _function;
 
 		folderPath = IO::FromDataFolder("Extract/" + filePath.Replace(fid.FileName, ""));
 	}
@@ -36,7 +57,7 @@ class FidWrapper
             int delta = 0;
             switch (spec.ColumnIndex)
             {
-                case FidWrapperColumnID::Method:   delta = (this.method < other.method) ? -1 : (this.method > other.method) ? +1 : 0; break;
+                case FidWrapperColumnID::GetFunction:   delta = this.getFunction - other.getFunction; break;
                 case FidWrapperColumnID::FilePath: delta = (this.filePath < other.filePath) ? -1 : (this.filePath > other.filePath) ? +1 : 0; break;
 				case FidWrapperColumnID::FileSize: delta = this.fid.ByteSize - other.fid.ByteSize; break;
 				default: throw("Sorting not implemented for column " + spec.ColumnIndex); break;
@@ -46,7 +67,7 @@ class FidWrapper
                 return (spec.SortDirection == UI::SortDirection::Ascending) ? delta : -delta;
         }
 
-        return other.id - this.id; // Fall back to original order when no sort specs are specified, useful when UI::TableFlags::SortTristate is enabled
+        return other.id - this.id; // Fall back to original order when no sort specs are specified. Useful when UI::TableFlags::SortTristate is enabled or if sorting algorithm is unstable.
     }
 
     void Extract()
@@ -65,10 +86,8 @@ class FidWrapper
 
     void PreloadNod()
     {
-        if (@fid.Nod != null)
-            return;
-
-        Fids::Preload(fid);
+        if (@fid.Nod == null)
+            Fids::Preload(fid);
     }
 
     void OpenNodExplorer()

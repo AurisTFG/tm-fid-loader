@@ -72,7 +72,7 @@ namespace FidLoader
 		{
 			UI::TableSetupScrollFreeze(0, 1);
 
-			UI::TableSetupColumn("Method",    UI::TableColumnFlags::None, 0.0f, FidWrapperColumnID::Method);
+			UI::TableSetupColumn("Get Function",    UI::TableColumnFlags::None, 0.0f, FidWrapperColumnID::GetFunction);
 			UI::TableSetupColumn("File path", UI::TableColumnFlags::WidthStretch, 0.0f, FidWrapperColumnID::FilePath);
 			UI::TableSetupColumn("Size",      UI::TableColumnFlags::None, 0.0f, FidWrapperColumnID::FileSize);
 			UI::TableSetupColumn("Actions",   UI::TableColumnFlags::NoSort, 0.0f, FidWrapperColumnID::Actions);
@@ -110,7 +110,7 @@ namespace FidLoader
 				UI::PushID(fid);
 				
 				UI::TableNextColumn();
-				UI::Text(fid.method);
+				UI::Text(GetFunctionName(fid.getFunction));
 				UI::TableNextColumn();
 				UI::Text(fid.filePath);
 				UI::TableNextColumn();
@@ -152,10 +152,8 @@ namespace FidLoader
 	void SearchForFidsCoro() 
 	{ 
 		fids = array<FidWrapper>();
-        array<string> filePaths = GetFilePaths(Setting_TextInput);
-        array<bool> methodSettings = { Setting_GetFake, Setting_GetGame, Setting_GetResource, Setting_GetUser, Setting_GetProgramData };
+        array<string> filePaths = GetFilePaths();
 
-		uint id = 0;
         for (uint i = 0; i < filePaths.Length; i++)
         {
 			string filePath = filePaths[i];
@@ -163,24 +161,13 @@ namespace FidLoader
             if (i % 100 == 0) 
 				yield();
 
-            for (uint j = 0; j < methods.Length; j++)
+            for (FidsGetFunction j = FidsGetFunction::Fake; j < FidsGetFunction::None; j++)
             {
-                if (!methodSettings[j])
-                    continue;
+				FidWrapper@ fid = GetFid(j, filePath);
 
-
-				CSystemFidFile@ fid = LoadFid(methods[j], filePath);
-
-#if TMNEXT
-				bool fidIsValid = @fid != null && fid.TimeWrite != "?";
-#else
-				bool fidIsValid = @fid != null && fid.ByteSize != 0;
-#endif
-
-				if (fidIsValid)
+				if (@fid != null)
 				{
-					fids.InsertLast(FidWrapper(id, fid, filePath, methods[j]));
-					id++;
+					fids.InsertLast(fid);
 					break;
 				}
                 
@@ -262,11 +249,11 @@ namespace FidLoader
 		TextFade::Stop();
 	}
 
-	array<string> GetFilePaths(const string &in multilineInput)
+	array<string> GetFilePaths()
 	{
 		array<string> filePaths = array<string>();
-		array<string> lines = multilineInput.Split("\n");
 
+		array<string> lines = Setting_TextInput.Split("\n");
 		for (uint i = 0; i < lines.Length; i++)
 		{
 			string line = lines[i].Trim();
@@ -277,51 +264,62 @@ namespace FidLoader
 			if (line == "" || line.StartsWith("//"))
 				continue;
 
-#if TURBO
-			line = line.Replace("\\", "/"); // backslashes dont work in Turbo
-#endif
+			line = line.Replace("\\", "/"); // backslashes dont work in Turbo, but for consistency lets force forward slashes everywhere
 
 			filePaths.InsertLast(line);
-
-			if (Setting_GetGame)
-			{
-				if (!line.StartsWith("GameData/"))
-				{
-			    	filePaths.InsertLast("GameData/" + line);
-				}
-			}
-
-			if (Setting_GetFake)
-			{
-				if (line.EndsWith(".Script.txt") && !line.StartsWith("Titles/Trackmania/Scripts/"))
-				{
-			    	filePaths.InsertLast("Titles/Trackmania/Scripts/" + line);
-				}
-				
-				if (!line.StartsWith("Titles/Trackmania/"))
-				{
-			    	filePaths.InsertLast("Titles/Trackmania/" + line);
-				}
-			}
 		}
 
 		return filePaths;
 	}
 
-	CSystemFidFile@ LoadFid(const string &in method, const string &in filePath)
+	bool IsFidValid(CSystemFidFile@ fid)
 	{
-		if (method == "GetFake")
-			return Fids::GetFake(filePath);
-		else if (method == "GetGame")
-			return Fids::GetGame(filePath);
-		else if (method == "GetResource")
-			return Fids::GetResource(filePath);
-		else if (method == "GetUser")
-			return Fids::GetUser(filePath);
-		else if (method == "GetProgramData")
-			return Fids::GetProgramData(filePath);
+#if TMNEXT
+		return @fid != null && fid.TimeWrite != "?";
+#else
+		return @fid != null && fid.ByteSize != 0;
+#endif
+	}
 
-		error("Invalid fid get method: " + method);
-		return null;
+	FidWrapper@ GetFid(FidsGetFunction getFunction, const string &in filePath)
+	{
+		CSystemFidFile@ fileFid = null;
+
+		if (getFunction == FidsGetFunction::Fake && Setting_GetFake)
+		{
+			if (filePath.EndsWith(".Script.txt")  && !filePath.StartsWith("Titles/Trackmania/Scripts/"))
+				@fileFid = Fids::GetFake("Titles/Trackmania/Scripts/" + filePath);
+
+			if (!IsFidValid(fileFid) && !filePath.StartsWith("Titles/Trackmania/"))
+				@fileFid = Fids::GetFake("Titles/Trackmania/" + filePath);
+
+			if (!IsFidValid(fileFid))
+				@fileFid = Fids::GetFake(filePath);
+		}
+		if (getFunction == FidsGetFunction::Game && Setting_GetGame)
+		{
+			if (!filePath.StartsWith("GameData/"))
+				@fileFid = Fids::GetGame("GameData/" + filePath);
+
+			if (!IsFidValid(fileFid))
+				@fileFid = Fids::GetGame(filePath);
+		}
+		if (getFunction == FidsGetFunction::ProgramData && Setting_GetProgramData)
+		{
+			@fileFid = Fids::GetProgramData(filePath);
+		}
+		if (getFunction == FidsGetFunction::Resource && Setting_GetResource)
+		{
+			@fileFid = Fids::GetResource(filePath);
+		}
+		if (getFunction == FidsGetFunction::User && Setting_GetUser)
+		{
+			@fileFid = Fids::GetUser(filePath);
+		}
+
+		if (!IsFidValid(fileFid))
+			return null;
+
+		return FidWrapper(fileFid, filePath, getFunction);
 	}
 }

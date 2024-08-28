@@ -5,9 +5,6 @@ const bool OPExtractPermission = OpenplanetHasFullPermissions();
 #else
 const bool OPExtractPermission = true;
 #endif
-
-const array<string> methods = { "GetFake", "GetGame", "GetResource", "GetUser", "GetProgramData" };
-
 const string windowLabel = "\\$b1f" + Icons::FolderOpen + (DEV ? "\\$d00" : "\\$z") + " Fid Loader" + (DEV ? " (Dev)" : "");
 
 #if TMNEXT
