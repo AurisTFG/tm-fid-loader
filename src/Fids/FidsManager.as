@@ -1,10 +1,11 @@
 namespace FidsManager
 {
-	array<FidData> foundFids;
+	array<FidData> fids;
+	bool fidsDirty = false;
 
 	void Init()
     {
-		foundFids = array<FidData>();
+		fids = array<FidData>();
     }
 
 	void MenuItem()
@@ -21,7 +22,7 @@ namespace FidsManager
 		UI::Begin(windowLabel, Setting_WindowOpen, UI::WindowFlags::NoCollapse | UI::WindowFlags::AlwaysAutoResize);
 
 		_UI::PushBorderStyle();
-		Setting_TextInput = UI::InputTextMultiline("##textInput", Setting_TextInput, vec2(425, 200));
+		Setting_TextInput = UI::InputTextMultiline("##textInput", Setting_TextInput, vec2(574, 200));
 		_UI::PopBorderStyle();
 
 		if (UI::Button(Icons::Search + " Search"))
@@ -48,56 +49,68 @@ namespace FidsManager
 
 		TextFade::Render();
 
-		if (foundFids.Length == 0 || Setting_DisableTableRender)
+		if (fids.Length == 0 || Setting_DisableTableRender)
 		{
 			UI::End();
 			return;
 		}
 		
+		int tableFlags = 
+			UI::TableFlags::Borders | 
+			UI::TableFlags::RowBg |
+			UI::TableFlags::SizingFixedFit | 
+			UI::TableFlags::ScrollY | 
+			UI::TableFlags::Sortable | 
+			UI::TableFlags::SortMulti;
+
 		UI::PushStyleColor(UI::Col::TableBorderStrong, Colors::Button);
-		if (UI::BeginTable("FidsTable", 4, UI::TableFlags::SizingFixedFit | UI::TableFlags::Borders | UI::TableFlags::ScrollY | UI::TableFlags::RowBg, vec2(0, 244)))
+		if (UI::BeginTable("Fids", 4, tableFlags, vec2(0, 244)))
 		{
 			UI::TableSetupScrollFreeze(0, 1);
 
-			UI::TableSetupColumn("Method");
-			UI::TableSetupColumn("File path");
-			UI::TableSetupColumn("Size");
-			UI::TableSetupColumn("Actions");
+			UI::TableSetupColumn("Method", UI::TableColumnFlags::DefaultSort);
+			UI::TableSetupColumn("File path", UI::TableColumnFlags::WidthStretch | UI::TableColumnFlags::DefaultSort);
+			UI::TableSetupColumn("Size", UI::TableColumnFlags::DefaultSort);
+			UI::TableSetupColumn("Actions", UI::TableColumnFlags::NoSort);
 			UI::TableHeadersRow();
 
-			for (uint i = 0; i < foundFids.Length; i++)
+			auto sortSpecs = UI::TableGetSortSpecs();
+			if (sortSpecs !is null && (sortSpecs.Dirty || fidsDirty))
+				SortItems(sortSpecs);
+
+			for (uint i = 0; i < fids.Length; i++)
 			{
-				UI::PushID(i + "");
+				UI::PushID(fids[i]);
 				UI::TableNextRow();
 				
 				UI::TableNextColumn();
-				UI::Text(foundFids[i].method);
+				UI::Text(fids[i].method);
 				UI::TableNextColumn();
-				UI::Text(foundFids[i].filePath);
+				UI::Text(fids[i].filePath);
 				UI::TableNextColumn();
-				UI::Text(foundFids[i].fid.ByteSize + " B");
+				UI::Text(fids[i].fid.ByteSize + " B");
 				UI::TableNextColumn();
 
 				if (!OPExtractPermission) 
 					_UI::PushRedButtonColor();
 				if (UI::Button("Extract"))
-					foundFids[i].Extract();
+					fids[i].Extract();
 				_UI::PopButtonColors();
 				UI::SameLine();
 				
 				if(!OPDevMode)
 					_UI::PushOrangeButtonColor();
-				if (!OPExtractPermission || @foundFids[i].fid.Nod == null) 
+				if (!OPExtractPermission || @fids[i].fid.Nod == null) 
 					_UI::PushRedButtonColor();
 				if (UI::Button("Nod"))
-					foundFids[i].OpenNodExplorer();
+					fids[i].OpenNodExplorer();
 				_UI::PopButtonColors();
 				UI::SameLine();
 
-				if (!IO::FolderExists(foundFids[i].folderPath)) 
+				if (!IO::FolderExists(fids[i].folderPath)) 
 					_UI::PushRedButtonColor();
 				if (UI::Button("Open Folder"))
-					foundFids[i].OpenFolder();
+					fids[i].OpenFolder();
 				_UI::PopButtonColors();
 
 				UI::PopID();
@@ -111,7 +124,7 @@ namespace FidsManager
 
 	void SearchForFidsCoro() 
 	{ 
-		foundFids = array<FidData>();
+		fids = array<FidData>();
         array<string> filePaths = GetFilePaths(Setting_TextInput);
         array<bool> methodSettings = { Setting_GetFake, Setting_GetGame, Setting_GetResource, Setting_GetUser, Setting_GetProgramData };
 
@@ -138,22 +151,25 @@ namespace FidsManager
 
 				if (fidIsValid)
 				{
-					foundFids.InsertLast(FidData(fid, filePath, methods[j]));
+					fids.InsertLast(FidData(fid, filePath, methods[j]));
 					break;
 				}
                 
             }
         }
 
+		if (fids.Length >= 2)
+			fidsDirty = true;
+
 		Fids::UpdateTree(Fids::GetGameFolder("")); // Cool "fix" to get rid of fake files that get added to fid explorer after search
 		
-		if (foundFids.Length == 0)
+		if (fids.Length == 0)
 		{
 			TextFade::Start("Did not find any files.", LogLevel::Error);
 			return;
 		}
 	
-		TextFade::Start("Found " + foundFids.Length + ((foundFids.Length == 1) ? " file!" : " files!"), LogLevel::Success);
+		TextFade::Start("Found " + fids.Length + ((fids.Length == 1) ? " file!" : " files!"), LogLevel::Success);
 	}
 
 	void LoadExample()
@@ -172,9 +188,9 @@ namespace FidsManager
 
         uint count = 0;
 
-        for (uint i = 0; i < foundFids.Length; i++)
+        for (uint i = 0; i < fids.Length; i++)
         {
-            if (Fids::Extract(foundFids[i].fid, Setting_HookMethod))
+            if (Fids::Extract(fids[i].fid, Setting_HookMethod))
             	count++;
         }
 
@@ -184,19 +200,19 @@ namespace FidsManager
 			return;
 		}
 
-		float percent = float(count) / foundFids.Length * 100;
-        TextFade::Start("Successfully extracted " + count + "/" + foundFids.Length + "! (" + Text::Format("%.2f", percent) + "%)", LogLevel::Success);
+		float percent = float(count) / fids.Length * 100;
+        TextFade::Start("Successfully extracted " + count + "/" + fids.Length + "! (" + Text::Format("%.2f", percent) + "%)", LogLevel::Success);
 	}
 
 	void PreloadAllNodsCoro()
 	{
 		int count = 0;
 
-		for (uint i = 0; i < foundFids.Length; i++)
+		for (uint i = 0; i < fids.Length; i++)
 		{
-			foundFids[i].PreloadNod();
+			fids[i].PreloadNod();
 
-			if (@foundFids[i].fid.Nod != null)
+			if (@fids[i].fid.Nod != null)
 				count++;
 		}
 
@@ -206,13 +222,14 @@ namespace FidsManager
 			return;
 		}
 
-		float percent = float(count) / foundFids.Length * 100;
-		TextFade::Start("Successfully preloaded " + count + "/" + foundFids.Length + " nods! (" + Text::Format("%.2f", percent) + "%)", LogLevel::Success);
+		float percent = float(count) / fids.Length * 100;
+		TextFade::Start("Successfully preloaded " + count + "/" + fids.Length + " nods! (" + Text::Format("%.2f", percent) + "%)", LogLevel::Success);
 	}
 
 	void Clear()
 	{
-		foundFids = array<FidData>();
+		fids = array<FidData>();
+
 		TextFade::Stop();
 	}
 
@@ -277,5 +294,42 @@ namespace FidsManager
 
 		error("Invalid fid get method: " + method);
 		return null;
+	}
+
+	void SortItems(UI::TableSortSpecs@ sortSpecs)
+	{
+		trace("Sorting items");
+		if (fids.Length < 2)
+		{
+			sortSpecs.Dirty = false;
+			fidsDirty = false;
+			return;
+		}
+
+		auto specs = sortSpecs.Specs;
+		for (int i = specs.Length - 1; i >= 0; i--) { // Reverse loop to sort by the last column first
+			auto spec = specs[i];
+
+			if (spec.SortDirection == UI::SortDirection::None)
+				continue;
+
+			if (spec.SortDirection == UI::SortDirection::Ascending) {
+				switch (spec.ColumnIndex) {
+				case 0: fids.Sort(function(a, b) { return a.method < b.method; }); break;
+				case 1: fids.Sort(function(a, b) { return a.filePath < b.filePath; }); break;
+				case 2: fids.Sort(function(a, b) { return a.fid.ByteSize < b.fid.ByteSize; }); break;
+				}
+
+			} else if (spec.SortDirection == UI::SortDirection::Descending) {
+				switch (spec.ColumnIndex) {
+				case 0: fids.Sort(function(a, b) { return a.method > b.method; }); break;
+				case 1: fids.Sort(function(a, b) { return a.filePath > b.filePath; }); break;
+				case 2: fids.Sort(function(a, b) { return a.fid.ByteSize > b.fid.ByteSize; }); break;
+				}
+			}
+		}
+
+		sortSpecs.Dirty = false;
+		fidsDirty = false;
 	}
 }
