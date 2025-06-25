@@ -1,33 +1,3 @@
-UI::TableSortSpecs@ g_currentSortSpecs = null;
-uint g_idCounter = 0;
-string GetFunctionName(FidsGetFunction method) { return FidsGetFunctions[method]; }
-
-enum FidWrapperColumnID
-{
-    GetFunction = 0,
-    FilePath = 1,
-    FileSize = 2,
-    Actions = 3,
-}
-
-enum FidsGetFunction
-{
-    Fake = 0,
-    Game = 1,
-    ProgramData = 2,
-    Resource = 3,
-    User = 4,
-    None = 5,
-}
-const array<string> FidsGetFunctions = { 
-    "Fake", 
-    "Game", 
-    "ProgramData", 
-    "Resource", 
-    "User",
-    "None",
-};
-
 class FidWrapper
 {
 	CSystemFidFile@ fid = null;

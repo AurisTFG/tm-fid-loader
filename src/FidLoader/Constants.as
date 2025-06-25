@@ -1,3 +1,5 @@
+// --- General ---
+
 const bool DEV = Meta::ExecutingPlugin().Name.ToLower().EndsWith("(dev)");
 const bool OPDevMode = Meta::IsDeveloperMode();
 #if TMNEXT
@@ -6,6 +8,18 @@ const bool OPExtractPermission = OpenplanetHasFullPermissions();
 const bool OPExtractPermission = true;
 #endif
 const string windowLabel = "\\$b1f" + Icons::FolderOpen + (DEV ? "\\$d00" : "\\$z") + " Fid Loader" + (DEV ? " (Dev)" : "");
+
+// --- Fid related ---
+
+const string GetFunctionName(FidsGetFunction method) { return FidsGetFunctions[method]; }
+const array<string> FidsGetFunctions = { 
+    "Fake", 
+    "Game", 
+    "ProgramData", 
+    "Resource", 
+    "User",
+    "None",
+};
 
 #if TMNEXT
 const string exampleText = """
