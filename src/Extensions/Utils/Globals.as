@@ -1,7 +1,1 @@
-namespace Utils
-{
-	namespace Globals
-	{
-		uint64 LastYield = Time::Now;
-	}
-}
+uint64 g_lastYield = Time::Now;

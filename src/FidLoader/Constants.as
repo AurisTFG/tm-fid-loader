@@ -1,18 +1,5 @@
-// --- General ---
-
-const bool DEV = Meta::ExecutingPlugin().Name.ToLower().EndsWith("(dev)");
-const bool OPDevMode = Meta::IsDeveloperMode();
-#if TMNEXT
-const bool OPExtractPermission = OpenplanetHasFullPermissions();
-#else
-const bool OPExtractPermission = true;
-#endif
-const string windowLabel = "\\$b1f" + Icons::FolderOpen + (DEV ? "\\$d00" : "\\$z") + " Fid Loader" + (DEV ? " (Dev)" : "");
-
-// --- Fid related ---
-
-const string GetFunctionName(FidsGetFunction method) { return FidsGetFunctions[method]; }
-const array<string> FidsGetFunctions = { 
+const string GetFunctionName(FidsGetFunction method) { return FIDS_GET_FUNCTIONS[method]; }
+const array<string> FIDS_GET_FUNCTIONS = { 
     "Fake", 
     "Game", 
     "ProgramData", 
@@ -22,7 +9,7 @@ const array<string> FidsGetFunctions = {
 };
 
 #if TMNEXT
-const string exampleText = """
+const string EXAMPLE_TEXT = """
 // GetFake:
 Libs/Nadeo/Trackmania/MainMenu/Constants.Script.txt
 Maps/Campaigns/CurrentQuarterly/Trackmania.Campaign.Gbx
@@ -45,13 +32,13 @@ Media/Text/PHlsl/ShadowBufferSoft.PHlsl.txt
 Media/Texture/Image/Arial.dds
 """;
 #elif TURBO
-const string exampleText = """
+const string EXAMPLE_TEXT = """
 // TODO: Add example text for Turbo
 """;
 #elif MP4
-const string exampleText = """
+const string EXAMPLE_TEXT = """
 // TODO: Add example text for MP4
 """;
 #else
-const string exampleText = "[WARNING] This game is not supported.";
+const string EXAMPLE_TEXT = "WARNING: This game is not supported.";
 #endif

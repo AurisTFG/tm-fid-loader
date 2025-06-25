@@ -22,7 +22,7 @@ namespace FidLoader
 
 	void MenuItem()
 	{
-		if (UI::MenuItem(windowLabel, "", Setting_WindowOpen))
+		if (UI::MenuItem(WINDOW_LABEL, "", Setting_WindowOpen))
 			Setting_WindowOpen = !Setting_WindowOpen;
 	}
 
@@ -31,7 +31,7 @@ namespace FidLoader
 		if (!Setting_WindowOpen) 
 			return;
 
-		UI::Begin(windowLabel, Setting_WindowOpen, UI::WindowFlags::NoCollapse | UI::WindowFlags::AlwaysAutoResize);
+		UI::Begin(WINDOW_LABEL, Setting_WindowOpen, UI::WindowFlags::NoCollapse | UI::WindowFlags::AlwaysAutoResize);
 
 		_UI::PushBorderStyle();
 		Setting_TextInput = UI::InputTextMultiline("##textInput", Setting_TextInput, vec2(574, 200));
@@ -45,7 +45,7 @@ namespace FidLoader
 			LoadExample();
 		UI::SameLine();
 
-		if (!OPExtractPermission) 
+		if (!OP_EXTRACT_PERMISSION) 
 			_UI::PushRedButtonColor();
 		if (UI::Button(Icons::FilesO + " Extract All Files"))
 			startnew(ExtractAllFilesCoro);
@@ -78,7 +78,8 @@ namespace FidLoader
 			UI::TableFlags::SortTristate;
 		vec2 tableSize = vec2(0, 298);
 
-		UI::PushStyleColor(UI::Col::TableBorderStrong, Colors::Button);
+		UI::PushStyleColor(UI::Col::TableBorderStrong, Colors::Border);
+		UI::PushStyleColor(UI::Col::TableBorderLight, Colors::Border);
 		UI::PushStyleVar(UI::StyleVar::CellPadding, vec2(5, 5));
 		if (UI::BeginTable("Fids", columnCount, tableFlags, tableSize))
 		{
@@ -140,16 +141,16 @@ namespace FidLoader
 					UI::Text(fid.fid.ByteSize + " B");
 					UI::TableNextColumn();
 
-					if (!OPExtractPermission) 
+					if (!OP_EXTRACT_PERMISSION) 
 						_UI::PushRedButtonColor();
 					if (UI::Button("Extract"))
 						fid.Extract();
 					_UI::PopButtonColors();
 					UI::SameLine();
 					
-					if(!OPDevMode)
+					if(!OP_DEV_MODE)
 						_UI::PushOrangeButtonColor();
-					if (!OPExtractPermission || @fid.fid.Nod == null) 
+					if (!OP_EXTRACT_PERMISSION || @fid.fid.Nod == null) 
 						_UI::PushRedButtonColor();
 					if (UI::Button("Nod"))
 						fid.OpenNodExplorer();
@@ -168,6 +169,7 @@ namespace FidLoader
 			UI::EndTable();
 		}
 		UI::PopStyleVar();
+		UI::PopStyleColor();
 		UI::PopStyleColor();
 
 		UI::End();
@@ -217,13 +219,13 @@ namespace FidLoader
 
 	void LoadExample()
 	{
-		Setting_TextInput = exampleText;
+		Setting_TextInput = EXAMPLE_TEXT;
 		TextFade::Start("Loaded an example.");
 	}
 
 	void ExtractAllFilesCoro() 
 	{ 
-		if (!OPExtractPermission)
+		if (!OP_EXTRACT_PERMISSION)
 		{
 			TextFade::Start("Club access is required to extract files.", LogLevel::Error);
 			return;

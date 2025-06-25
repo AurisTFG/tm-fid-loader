@@ -17,10 +17,10 @@ namespace _UI
         }
     }
 
-    void PushBorderStyle(float size = 1.0f, vec4 color = Colors::Button)
+    void PushBorderStyle(float size = 1.0f)
     {
         UI::PushStyleVar(UI::StyleVar::FrameBorderSize, size);
-        UI::PushStyleColor(UI::Col::Border, color);
+        UI::PushStyleColor(UI::Col::Border, Colors::Border);
     }
     void PopBorderStyle()
     {

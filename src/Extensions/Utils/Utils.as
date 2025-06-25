@@ -2,10 +2,9 @@ namespace Utils
 {
 	void YieldIfNeeded()
 	{
-		if (Time::Now - Globals::LastYield >= Constants::YIELD_AFTER_MS)
+		if (Time::Now - g_lastYield >= YIELD_AFTER_MS)
 		{
-			Globals::LastYield = Time::Now;
-			trace("Yielding to prevent UI freeze...");
+			g_lastYield = Time::Now;
 			yield();
 		}
 	}

@@ -42,7 +42,7 @@ class FidWrapper
 
     void Extract()
     {	
-        if (!OPExtractPermission)
+        if (!OP_EXTRACT_PERMISSION)
         {
             TextFade::Start("Club access is required to extract files.", LogLevel::Error);
             return;
@@ -62,12 +62,12 @@ class FidWrapper
 
     void OpenNodExplorer()
     {
-        if (!OPExtractPermission)
+        if (!OP_EXTRACT_PERMISSION)
         {
             TextFade::Start("Club access is required to Explore Nods.", LogLevel::Error);
             return;
         }
-        if (!OPDevMode)
+        if (!OP_DEV_MODE)
         {
             TextFade::Start("Enable Developer Mode in Openplanet to Explore Nods.", LogLevel::Warning);
             return;

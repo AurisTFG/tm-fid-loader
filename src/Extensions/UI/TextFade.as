@@ -1,16 +1,9 @@
-enum LogLevel 
-{
-    Info = 0, 
-    Success = 1, 
-    Warning = 2, 
-    Error = 3
-}
-
 namespace TextFade
 { 
     namespace _
     {
-        float Duration = 3000.0f; // 3 seconds
+        const float DURATION = 3000.0f; // 3 seconds
+
         vec4 Color = Colors::White;
         string Text = "";
     }
@@ -18,25 +11,25 @@ namespace TextFade
     void Start(const string &in text, LogLevel level = LogLevel::Info, bool printToLog = true)
     {
         _::Text = text;
-        _::Color = Colors::LogLevels[level];
+        _::Color = GetLogLevelColor(level);
 
-        if (printToLog)
+        if (!printToLog || _::Text == "")
+            return;
+
+        switch (level)
         {
-            switch (level)
-            {
-                case LogLevel::Info:
-                    trace(text);
-                    break;
-                case LogLevel::Success:
-                    print(text);
-                    break;
-                case LogLevel::Warning:
-                    warn(text);
-                    break;
-                case LogLevel::Error:
-                    error(text);
-                    break;
-            }
+            case LogLevel::Info:
+                trace(text);
+                break;
+            case LogLevel::Success:
+                print(text);
+                break;
+            case LogLevel::Warning:
+                warn(text);
+                break;
+            case LogLevel::Error:
+                error(text);
+                break;
         }
     }
     
@@ -58,7 +51,7 @@ namespace TextFade
         if (_::Text == "")
             return;
         
-        _::Color.w -= dt / _::Duration;
+        _::Color.w -= dt / _::DURATION;
         if (_::Color.w <= 0.0f)
             Stop();
     }
