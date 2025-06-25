@@ -76,7 +76,7 @@ namespace FidLoader
 			UI::TableFlags::Sortable | 
 			UI::TableFlags::SortMulti |
 			UI::TableFlags::SortTristate;
-		vec2 tableSize = vec2(0, 298);
+		vec2 tableSize = vec2(1000, 298);
 
 		UI::PushStyleColor(UI::Col::TableBorderStrong, Colors::Border);
 		UI::PushStyleColor(UI::Col::TableBorderLight, Colors::Border);
@@ -87,7 +87,7 @@ namespace FidLoader
 
 			UI::TableSetupColumn("Get Function",    UI::TableColumnFlags::None, 0.0f, FidWrapperColumnID::GetFunction);
 			UI::TableSetupColumn("File path", UI::TableColumnFlags::WidthStretch, 0.0f, FidWrapperColumnID::FilePath);
-			UI::TableSetupColumn("Size",      UI::TableColumnFlags::None, 0.0f, FidWrapperColumnID::FileSize);
+			UI::TableSetupColumn("Size, B",      UI::TableColumnFlags::WidthFixed, 70.0f, FidWrapperColumnID::FileSize);
 			UI::TableSetupColumn("Actions",   UI::TableColumnFlags::NoSort, 0.0f, FidWrapperColumnID::Actions);
 
 			UI::TableNextRow(UI::TableRowFlags::Headers);
@@ -138,7 +138,7 @@ namespace FidLoader
 					UI::TableNextColumn();
 					UI::Text(fid.filePath);
 					UI::TableNextColumn();
-					UI::Text(fid.fid.ByteSize + " B");
+					UI::Text(tostring(fid.fid.ByteSize));
 					UI::TableNextColumn();
 
 					if (!OP_EXTRACT_PERMISSION) 
