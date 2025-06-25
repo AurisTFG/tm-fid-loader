@@ -118,45 +118,47 @@ namespace FidLoader
 				@g_currentSortSpecs = null;
 			}
 
-			// TODO: UI::ListClipper clipper(fids.Length);
-			
-			for (uint i = 0; i < fids.Length; i++)
+			UI::ListClipper clipper(fids.Length);
+			while (clipper.Step())
 			{
-				auto fid = fids[i];
+				for (uint i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
+				{
+					auto fid = fids[i];
 
-				UI::PushID(fid);
-				
-				UI::TableNextColumn();
-				UI::Text(GetFunctionName(fid.getFunction));
-				UI::TableNextColumn();
-				UI::Text(fid.filePath);
-				UI::TableNextColumn();
-				UI::Text(fid.fid.ByteSize + " B");
-				UI::TableNextColumn();
+					UI::PushID(fid);
+					
+					UI::TableNextColumn();
+					UI::Text(GetFunctionName(fid.getFunction));
+					UI::TableNextColumn();
+					UI::Text(fid.filePath);
+					UI::TableNextColumn();
+					UI::Text(fid.fid.ByteSize + " B");
+					UI::TableNextColumn();
 
-				if (!OPExtractPermission) 
-					_UI::PushRedButtonColor();
-				if (UI::Button("Extract"))
-					fid.Extract();
-				_UI::PopButtonColors();
-				UI::SameLine();
-				
-				if(!OPDevMode)
-					_UI::PushOrangeButtonColor();
-				if (!OPExtractPermission || @fid.fid.Nod == null) 
-					_UI::PushRedButtonColor();
-				if (UI::Button("Nod"))
-					fid.OpenNodExplorer();
-				_UI::PopButtonColors();
-				UI::SameLine();
+					if (!OPExtractPermission) 
+						_UI::PushRedButtonColor();
+					if (UI::Button("Extract"))
+						fid.Extract();
+					_UI::PopButtonColors();
+					UI::SameLine();
+					
+					if(!OPDevMode)
+						_UI::PushOrangeButtonColor();
+					if (!OPExtractPermission || @fid.fid.Nod == null) 
+						_UI::PushRedButtonColor();
+					if (UI::Button("Nod"))
+						fid.OpenNodExplorer();
+					_UI::PopButtonColors();
+					UI::SameLine();
 
-				if (!IO::FolderExists(fid.folderPath)) 
-					_UI::PushRedButtonColor();
-				if (UI::Button("Open Folder"))
-					fid.OpenFolder();
-				_UI::PopButtonColors();
+					if (!IO::FolderExists(fid.folderPath)) 
+						_UI::PushRedButtonColor();
+					if (UI::Button("Open Folder"))
+						fid.OpenFolder();
+					_UI::PopButtonColors();
 
-				UI::PopID();
+					UI::PopID();
+				}
 			}
 			UI::EndTable();
 		}
