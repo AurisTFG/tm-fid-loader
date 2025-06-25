@@ -11,8 +11,13 @@ namespace FidLoader
 
 	void CleanUp()
 	{
-		fids = array<FidWrapper>();
 		TextFade::Stop();
+
+		fids = array<FidWrapper>();
+		fidsDirty = false;
+		resetTableState = false;
+		@g_currentSortSpecs = null;
+		g_idCounter = 0;
 	}
 
 	void MenuItem()
@@ -121,7 +126,7 @@ namespace FidLoader
 			UI::ListClipper clipper(fids.Length);
 			while (clipper.Step())
 			{
-				for (uint i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
+				for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
 				{
 					auto fid = fids[i];
 
@@ -170,8 +175,10 @@ namespace FidLoader
 
 	void SearchForFidsCoro() 
 	{ 
-		fids = array<FidWrapper>();
         array<string> filePaths = GetFilePaths();
+		fids = array<FidWrapper>();
+		auto newFids = array<FidWrapper>();
+		TextFade::Stop();
 
         for (uint i = 0; i < filePaths.Length; i++)
         {
@@ -186,25 +193,27 @@ namespace FidLoader
 
 				if (@fid != null)
 				{
-					fids.InsertLast(fid);
+					newFids.InsertLast(fid);
 					break;
 				}
                 
             }
         }
 
-		if (fids.Length >= 2)
-			fidsDirty = true;
-
 		Fids::UpdateTree(Fids::GetGameFolder("")); // Cool "fix" to get rid of fake files that get added to fid explorer after search
 		
-		if (fids.Length == 0)
+		if (newFids.Length == 0)
 		{
 			TextFade::Start("Did not find any files.", LogLevel::Error);
 			return;
 		}
-	
-		TextFade::Start("Found " + fids.Length + ((fids.Length == 1) ? " file!" : " files!"), LogLevel::Success);
+
+		TextFade::Start("Found " + newFids.Length + ((newFids.Length == 1) ? " file!" : " files!"), LogLevel::Success);
+		
+		fids = newFids;
+		
+		if (fids.Length >= 2)
+			fidsDirty = true;
 	}
 
 	void LoadExample()
