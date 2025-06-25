@@ -184,9 +184,6 @@ namespace FidLoader
         {
 			string filePath = filePaths[i];
 
-            if (i % 100 == 0) 
-				yield();
-
             for (FidsGetFunction j = FidsGetFunction::Fake; j < FidsGetFunction::None; j++)
             {
 				FidWrapper@ fid = GetFid(j, filePath);
@@ -198,6 +195,8 @@ namespace FidLoader
 				}
                 
             }
+
+			Utils::YieldIfNeeded();
         }
 
 		Fids::UpdateTree(Fids::GetGameFolder("")); // Cool "fix" to get rid of fake files that get added to fid explorer after search
@@ -286,15 +285,14 @@ namespace FidLoader
 		{
 			string line = lines[i].Trim();
 
-			if (i % 1000 == 0)
-				yield();
-
 			if (line == "" || line.StartsWith("//"))
 				continue;
 
 			line = line.Replace("\\", "/"); // backslashes dont work in Turbo, but for consistency lets force forward slashes everywhere
 
 			filePaths.InsertLast(line);
+
+			Utils::YieldIfNeeded();
 		}
 
 		return filePaths;
