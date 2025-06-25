@@ -117,6 +117,8 @@ namespace FidLoader
 				fidsDirty = false;
 				@g_currentSortSpecs = null;
 			}
+
+			// TODO: UI::ListClipper clipper(fids.Length);
 			
 			for (uint i = 0; i < fids.Length; i++)
 			{

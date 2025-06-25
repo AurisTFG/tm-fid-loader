@@ -11,14 +11,14 @@ const string windowLabel = "\\$b1f" + Icons::FolderOpen + (DEV ? "\\$d00" : "\\$
 const string exampleText = """
 // GetFake:
 Libs/Nadeo/Trackmania/MainMenu/Constants.Script.txt
-Maps/Campaigns/Training/Training - 18.Map.Gbx
+Maps/Campaigns/CurrentQuarterly/Trackmania.Campaign.Gbx
 Scripts/Modes/TrackMania/TM_Laps_Online.Script.txt
 // GetGame:
 Trackmania.exe
 MaterialLib_Stadium.txt
 Packs/Translations.zip
 // GetUser:
-Config/Default.ScriptWorkspace.Gbx
+Config/GfxDevicePerfs.txt
 Config/Default.json
 Config/User.FidCache.Gbx
 // GetProgramData:
@@ -32,36 +32,12 @@ Media/Texture/Image/Arial.dds
 """;
 #elif TURBO
 const string exampleText = """
-// GetFake:
-Maps/Campaigns/Training/Training - 18.Map.Gbx
-Scripts/Modes/TrackMania/TM_Laps_Online.Script.txt
-Libs/Nadeo/Trackmania/MainMenu/Constants.Script.txt
-// GetGame:
-Trackmania.exe
-MaterialLib_Stadium.txt
-// GetUser:
-Config/Default.json
-// GetProgramData:
-checksum.txt
-// GetResource:
-Media/Texture/HotGrid.Texture.gbx
+// TODO: Add example text for Turbo
 """;
 #elif MP4
 const string exampleText = """
-// GetFake:
-Maps/Campaigns/Training/Training - 18.Map.Gbx
-Scripts/Modes/TrackMania/TM_Laps_Online.Script.txt
-Libs/Nadeo/Trackmania/MainMenu/Constants.Script.txt
-// GetGame:
-Trackmania.exe
-MaterialLib_Stadium.txt
-// GetUser:
-Config/Default.json
-// GetProgramData:
-checksum.txt
-// GetResource:
-Media/Texture/HotGrid.Texture.gbx
+// TODO: Add example text for MP4
 """;
 #else
-const string exampleText = "";
+const string exampleText = "[WARNING] This game is not supported.";
 #endif
