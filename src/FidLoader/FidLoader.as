@@ -59,6 +59,7 @@ namespace FidLoader
 		if (UI::Button(Icons::TrashO + " Clear"))
 			Clear();
 		
+		ProgressBar::Render();
 		TextFade::Render();
 
 		if (fids.Length == 0 || Setting_DisableTableRender)
@@ -180,7 +181,9 @@ namespace FidLoader
         array<string> filePaths = GetFilePaths();
 		fids = array<FidWrapper>();
 		auto newFids = array<FidWrapper>();
+
 		TextFade::Stop();
+		ProgressBar::Start("Searching for files", filePaths.Length);
 
         for (uint i = 0; i < filePaths.Length; i++)
         {
@@ -198,9 +201,11 @@ namespace FidLoader
                 
             }
 
+			ProgressBar::UpdateProgress(i + 1);
 			Utils::YieldIfNeeded();
         }
-
+		
+		ProgressBar::Stop();
 		Fids::UpdateTree(Fids::GetGameFolder("")); // Cool "fix" to get rid of fake files that get added to fid explorer after search
 		
 		if (newFids.Length == 0)
@@ -231,13 +236,19 @@ namespace FidLoader
 			return;
 		}
 
-        uint count = 0;
+		ProgressBar::Start("Extracting files", fids.Length);
 
+        uint count = 0;
         for (uint i = 0; i < fids.Length; i++)
         {
             if (Fids::Extract(fids[i].fid, Setting_HookMethod))
             	count++;
-        }
+
+			ProgressBar::UpdateProgress(i + 1);
+			Utils::YieldIfNeeded();
+		}
+
+		ProgressBar::Stop();
 
 		if (count == 0)
 		{
@@ -251,15 +262,21 @@ namespace FidLoader
 
 	void PreloadAllNodsCoro()
 	{
-		int count = 0;
+		ProgressBar::Start("Preloading nods", fids.Length);
 
+		int count = 0;
 		for (uint i = 0; i < fids.Length; i++)
 		{
 			fids[i].PreloadNod();
 
 			if (@fids[i].fid.Nod != null)
 				count++;
+
+			ProgressBar::UpdateProgress(i + 1);
+			Utils::YieldIfNeeded();
 		}
+
+		ProgressBar::Stop();
 
 		if (count == 0)
 		{
@@ -281,8 +298,10 @@ namespace FidLoader
 	array<string> GetFilePaths()
 	{
 		array<string> filePaths = array<string>();
-
 		array<string> lines = Setting_TextInput.Split("\n");
+
+		ProgressBar::Start("Parsing text input", lines.Length);
+
 		for (uint i = 0; i < lines.Length; i++)
 		{
 			string line = lines[i].Trim();
@@ -294,8 +313,11 @@ namespace FidLoader
 
 			filePaths.InsertLast(line);
 
+			ProgressBar::UpdateProgress(i + 1);
 			Utils::YieldIfNeeded();
 		}
+
+		ProgressBar::Stop();
 
 		return filePaths;
 	}
