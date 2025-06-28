@@ -48,7 +48,7 @@ class FidWrapper
             return;
         }
 
-        if (Fids::Extract(this.fid, Setting_HookMethod))
+        if (Fids::Extract(this.fid, Settings::HookMethod))
             TextFade::Start("Successfully extracted file \"" + this.filePath + "\"", LogLevel::Success);
         else
             TextFade::Start("Failed to extract " + "\"" + this.filePath + "\"", LogLevel::Error);

@@ -22,19 +22,19 @@ namespace FidLoader
 
 	void MenuItem()
 	{
-		if (UI::MenuItem(WINDOW_LABEL, "", Setting_WindowOpen))
-			Setting_WindowOpen = !Setting_WindowOpen;
+		if (UI::MenuItem(WINDOW_LABEL, "", Settings::WindowOpen))
+			Settings::WindowOpen = !Settings::WindowOpen;
 	}
 
 	void Render()
 	{
-		if (!Setting_WindowOpen) 
+		if (!Settings::WindowOpen) 
 			return;
 
-		UI::Begin(WINDOW_LABEL, Setting_WindowOpen, UI::WindowFlags::NoCollapse | UI::WindowFlags::AlwaysAutoResize);
+		UI::Begin(WINDOW_LABEL, Settings::WindowOpen, UI::WindowFlags::NoCollapse | UI::WindowFlags::AlwaysAutoResize);
 
 		_UI::PushBorderStyle();
-		Setting_TextInput = UI::InputTextMultiline("##textInput", Setting_TextInput, vec2(574, 200));
+		Settings::TextInput = UI::InputTextMultiline("##textInput", Settings::TextInput, vec2(574, 200));
 		_UI::PopBorderStyle();
 
 		if (UI::Button(Icons::Search + " Search"))
@@ -62,7 +62,7 @@ namespace FidLoader
 		ProgressBar::Render();
 		TextFade::Render();
 
-		if (fids.Length == 0 || Setting_DisableTableRender)
+		if (fids.Length == 0 || Settings::DisableTableRender)
 		{
 			UI::End();
 			return;
@@ -224,7 +224,7 @@ namespace FidLoader
 
 	void LoadExample()
 	{
-		Setting_TextInput = EXAMPLE_TEXT;
+		Settings::TextInput = EXAMPLE_TEXT;
 		TextFade::Start("Loaded an example.");
 	}
 
@@ -241,7 +241,7 @@ namespace FidLoader
         uint count = 0;
         for (uint i = 0; i < fids.Length; i++)
         {
-            if (Fids::Extract(fids[i].fid, Setting_HookMethod))
+            if (Fids::Extract(fids[i].fid, Settings::HookMethod))
             	count++;
 
 			ProgressBar::UpdateProgress(i + 1);
@@ -298,7 +298,7 @@ namespace FidLoader
 	array<string> GetFilePaths()
 	{
 		array<string> filePaths = array<string>();
-		array<string> lines = Setting_TextInput.Split("\n");
+		array<string> lines = Settings::TextInput.Split("\n");
 
 		ProgressBar::Start("Parsing text input", lines.Length);
 
@@ -335,7 +335,7 @@ namespace FidLoader
 	{
 		CSystemFidFile@ fileFid = null;
 
-		if (getFunction == FidsGetFunction::Fake && Setting_GetFake)
+		if (getFunction == FidsGetFunction::Fake && Settings::GetFake)
 		{
 			if (filePath.EndsWith(".Script.txt")  && !filePath.StartsWith("Titles/Trackmania/Scripts/"))
 				@fileFid = Fids::GetFake("Titles/Trackmania/Scripts/" + filePath);
@@ -346,7 +346,7 @@ namespace FidLoader
 			if (!IsFidValid(fileFid))
 				@fileFid = Fids::GetFake(filePath);
 		}
-		if (getFunction == FidsGetFunction::Game && Setting_GetGame)
+		if (getFunction == FidsGetFunction::Game && Settings::GetGame)
 		{
 			if (!filePath.StartsWith("GameData/"))
 				@fileFid = Fids::GetGame("GameData/" + filePath);
@@ -354,15 +354,15 @@ namespace FidLoader
 			if (!IsFidValid(fileFid))
 				@fileFid = Fids::GetGame(filePath);
 		}
-		if (getFunction == FidsGetFunction::ProgramData && Setting_GetProgramData)
+		if (getFunction == FidsGetFunction::ProgramData && Settings::GetProgramData)
 		{
 			@fileFid = Fids::GetProgramData(filePath);
 		}
-		if (getFunction == FidsGetFunction::Resource && Setting_GetResource)
+		if (getFunction == FidsGetFunction::Resource && Settings::GetResource)
 		{
 			@fileFid = Fids::GetResource(filePath);
 		}
-		if (getFunction == FidsGetFunction::User && Setting_GetUser)
+		if (getFunction == FidsGetFunction::User && Settings::GetUser)
 		{
 			@fileFid = Fids::GetUser(filePath);
 		}
