@@ -1,3 +1,9 @@
+float TABLE_HEADER_HEIGHT = 25.0f;
+float TABLE_ROW_HEIGHT = 34.0f;
+float APPROX_TABLE_LABEL_TEXT_WIDTH = 75.0f;
+
+array<string> ROWS_OPTIONS = {"5", "10", "15", "20", "25", "30"};
+
 const string GetFunctionName(FidsGetFunction method) { return FIDS_GET_FUNCTIONS[method]; }
 const array<string> FIDS_GET_FUNCTIONS = { 
     "Fake", 

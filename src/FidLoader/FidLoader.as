@@ -3,6 +3,8 @@ namespace FidLoader
 	array<FidWrapper> fids;
 	bool fidsDirty = false;
 	bool resetTableState = false;
+	vec2 tableSize = vec2(1000.0f, TABLE_HEADER_HEIGHT + 5 * TABLE_ROW_HEIGHT);
+	float dropdownWidth = 70.0f;
 
 	void Init()
     {
@@ -60,6 +62,7 @@ namespace FidLoader
 			Clear();
 		
 		ProgressBar::Render();
+		UI::AlignTextToFramePadding();
 		TextFade::Render();
 
 		if (fids.Length == 0 || Settings::DisableTableRender)
@@ -67,6 +70,31 @@ namespace FidLoader
 			UI::End();
 			return;
 		}
+
+		UI::SameLine();
+		UI::AlignTextToFramePadding();
+		UI::SetCursorPosX((tableSize.x - APPROX_TABLE_LABEL_TEXT_WIDTH) / 2.0f);
+		UI::Text("Total files: " + fids.Length);
+
+		UI::SameLine();
+		UI::SetCursorPosX(tableSize.x - dropdownWidth);
+		UI::SetNextItemWidth(dropdownWidth);
+		_UI::PushBorderStyle();
+		string tableRowCount = tostring(Settings::TableRowCount);
+		if (UI::BeginCombo("##numberOfRows", tableRowCount))
+		{
+			for (uint i = 0; i < ROWS_OPTIONS.Length; i++)
+			{
+				auto rowOption = ROWS_OPTIONS[i];
+				bool isSelected = (tableRowCount == rowOption);
+				if (UI::Selectable(rowOption, isSelected))
+				{
+					ComputeTableHeight(rowOption);
+				}
+			}
+			UI::EndCombo();	
+		}
+		_UI::PopBorderStyle();
 		
 		int columnCount = 4;
 		int tableFlags = 
@@ -77,8 +105,6 @@ namespace FidLoader
 			UI::TableFlags::Sortable | 
 			UI::TableFlags::SortMulti |
 			UI::TableFlags::SortTristate;
-		vec2 tableSize = vec2(1000, 298);
-
 		UI::PushStyleColor(UI::Col::TableBorderStrong, Colors::Border);
 		UI::PushStyleColor(UI::Col::TableBorderLight, Colors::Border);
 		UI::PushStyleVar(UI::StyleVar::CellPadding, vec2(5, 5));
@@ -217,9 +243,10 @@ namespace FidLoader
 		TextFade::Start("Found " + newFids.Length + ((newFids.Length == 1) ? " file!" : " files!"), LogLevel::Success);
 		
 		fids = newFids;
-		
 		if (fids.Length >= 2)
 			fidsDirty = true;
+
+		ComputeTableHeight(tostring(Settings::TableRowCount));
 	}
 
 	void LoadExample()
@@ -371,5 +398,18 @@ namespace FidLoader
 			return null;
 
 		return FidWrapper(fileFid, filePath, getFunction);
+	}
+
+	void ComputeTableHeight(const string &in rowOption)
+	{
+		uint rowCount = Text::ParseUInt(rowOption);
+		Settings::TableRowCount = rowCount;
+
+		if (rowCount <= 0 || rowCount > fids.Length)
+			rowCount = fids.Length;
+
+		tableSize.y = TABLE_HEADER_HEIGHT + rowCount * TABLE_ROW_HEIGHT;
+
+		resetTableState = true;
 	}
 }

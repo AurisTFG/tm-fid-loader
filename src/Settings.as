@@ -34,4 +34,7 @@ namespace Settings
 
     [Setting hidden]
     string TextInput = "*Type file paths here*";
+
+    [Setting hidden]
+    uint TableRowCount = 5;
 }
